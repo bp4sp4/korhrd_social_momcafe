@@ -1684,14 +1684,17 @@ export default function AdminPage() {
                       placeholder="카페 ID 또는 네이버 카페 URL"
                       onChange={async e => {
                         const val = e.target.value;
-                        setAddMamcafeNewId(val);
-                        // 네이버 URL 붙여넣기 시 자동 카페명 조회
-                        if (val.includes('cafe.naver.com')) {
+                        const urlMatch = val.match(/(?:https?:\/\/)?(?:m\.)?cafe\.naver\.com\/([a-zA-Z0-9_]+)/);
+                        if (urlMatch) {
+                          // URL → ID 즉시 추출
+                          setAddMamcafeNewId(urlMatch[1]);
                           try {
-                            const res = await fetch(`/api/cafe-lookup?url=${encodeURIComponent(val)}`);
+                            const res = await fetch(`/api/cafe-lookup?id=${encodeURIComponent(urlMatch[1])}`);
                             const data = await res.json();
                             if (data.name) setAddMamcafeNewName(data.name);
                           } catch {}
+                        } else {
+                          setAddMamcafeNewId(val);
                         }
                       }}
                     />
