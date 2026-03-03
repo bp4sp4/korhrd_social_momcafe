@@ -40,6 +40,27 @@ export default function AdminPage() {
   const [showCounselCheckModal, setShowCounselCheckModal] = useState(false);
   const [counselCheckText, setCounselCheckText] = useState('');
   const [counselCheckEtcInput, setCounselCheckEtcInput] = useState('');
+  const [activeTab, setActiveTab] = useState<'consultations' | 'tracking'>('consultations');
+  const defaultCafes = [
+    { id: 'cjsam', name: '순광맘' },
+    { id: 'chobomamy', name: '러브양산맘' },
+    { id: 'jinhaemam', name: '창원진해댁' },
+    { id: 'momspanggju', name: '광주맘스팡' },
+    { id: 'cjasm', name: '충주아사모' },
+    { id: 'mygodsend', name: '화성남양애' },
+    { id: 'yul2moms', name: '율하맘' },
+    { id: 'chbabymom', name: '춘천맘' },
+    { id: 'seosanmom', name: '서산맘' },
+    { id: 'redog2oi', name: '부천소사구' },
+    { id: 'ksn82599', name: '둔산맘' },
+  ];
+  const [cafes, setCafes] = useState(defaultCafes);
+  const [newCafeName, setNewCafeName] = useState('');
+  const [newCafeId, setNewCafeId] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showAddCafeModal, setShowAddCafeModal] = useState(false);
+  const [cafeSearchText, setCafeSearchText] = useState('');
+  const [cafeLookupLoading, setCafeLookupLoading] = useState(false);
     // 거주지 모달 열기/닫기
     const openResidenceModal = (consultation: Consultation) => {
       setSelectedConsultation(consultation);
@@ -133,6 +154,55 @@ export default function AdminPage() {
     } else {
       router.push('/admin/login');
     }
+  };
+
+  // 카페 목록 localStorage 로드
+  useEffect(() => {
+    const saved = localStorage.getItem('baro_cafes');
+    if (saved) {
+      try { setCafes(JSON.parse(saved)); } catch {}
+    }
+  }, []);
+
+  const saveCafes = (updated: typeof cafes) => {
+    setCafes(updated);
+    localStorage.setItem('baro_cafes', JSON.stringify(updated));
+  };
+
+  const handleAddCafe = (e?: React.MouseEvent | React.KeyboardEvent) => {
+    e?.preventDefault();
+    const name = newCafeName.trim();
+    const id = newCafeId.trim().replace(/\s/g, '');
+    if (!name) { alert('카페 이름을 입력해주세요.'); return; }
+    if (!id) { alert('카페 ID를 입력해주세요.'); return; }
+    if (cafes.some(c => c.id === id)) { alert('이미 존재하는 카페 ID입니다.'); return; }
+    saveCafes([...cafes, { id, name }]);
+    setNewCafeName('');
+    setNewCafeId('');
+    setShowAddCafeModal(false);
+  };
+
+  const handleDeleteCafe = (id: string) => {
+    if (!confirm('삭제하시겠습니까?')) return;
+    saveCafes(cafes.filter(c => c.id !== id));
+  };
+
+  const lookupCafeName = async (id: string) => {
+    if (!id) return;
+    setCafeLookupLoading(true);
+    try {
+      const res = await fetch(`/api/cafe-lookup?id=${encodeURIComponent(id)}`);
+      const data = await res.json();
+      if (data.name) setNewCafeName(data.name);
+    } catch {}
+    setCafeLookupLoading(false);
+  };
+
+  const handleCopyLink = (id: string) => {
+    const link = `https://barosocial.vercel.app/mamcafe/${id}`;
+    navigator.clipboard.writeText(link);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   // 로그아웃
@@ -684,29 +754,22 @@ export default function AdminPage() {
   ).sort() as string[];
 
   // 고유 취득사유 목록
-  const uniqueReasons = ['즉시취업', '이직', '미래', '취미', '준비'];
+  const uniqueReasons = ['즉시취업', '이직', '미래준비', '취업'];
 
   // 고유 고민(상담체크) 목록
   const uniqueCounselChecks = ['타기관', '자체가격', '직장', '육아', '가격비교', '기타'];
 
-  // 대분류별 사전 정의 중분류
-  const predefinedMinorCategories: Record<string, string[]> = {
-    '당근': ['당근채팅', '대표전화(당근)'],
-    '맘카페': ['순광맘', '러브양산맘', '창원진해댁', '광주맘스팡', '충주아사모', '화성남양애', '율하맘', '춘천맘', '서산맘', '부천소사구', '둔산맘'],
-  };
-
-  // 대분류 선택 시 해당하는 중분류만 표시 (사전 정의 값 포함)
+  // 중분류: 실제 데이터 있는 것만 표시
   const uniqueMinorCategories = Array.from(
-    new Set([
-      ...(majorCategoryFilter !== 'all' ? (predefinedMinorCategories[majorCategoryFilter] || []) : []),
-      ...consultations
+    new Set(
+      consultations
         .filter(c => {
           if (majorCategoryFilter === 'all') return true;
           return parseClickSource(c.click_source).major === majorCategoryFilter;
         })
         .map(c => parseClickSource(c.click_source).minor)
-        .filter(Boolean),
-    ])
+        .filter(Boolean)
+    )
   ).sort() as string[];
 
   const goToPage = (page: number) => {
@@ -917,7 +980,134 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {loading ? (
+      {/* 탭 네비게이션 */}
+      <div className={styles.tabNav}>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'consultations' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('consultations')}
+        >상담 관리</button>
+        <button
+          className={`${styles.tabBtn} ${activeTab === 'tracking' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('tracking')}
+        >추적링크 관리</button>
+      </div>
+
+      {/* 추적링크 탭 */}
+      {activeTab === 'tracking' && (
+        <div className={styles.trackingContainer}>
+          <div className={styles.trackingToolbar}>
+            <input
+              type="text"
+              placeholder="카페명 또는 ID 검색..."
+              value={cafeSearchText}
+              onChange={e => setCafeSearchText(e.target.value)}
+              className={styles.trackingSearchInput}
+            />
+            <span className={styles.trackingCount}>{cafes.filter(c => !cafeSearchText || c.name.includes(cafeSearchText) || c.id.includes(cafeSearchText)).length}개</span>
+            <button type="button" onClick={() => { setNewCafeName(''); setNewCafeId(''); setShowAddCafeModal(true); }} className={styles.addButton}>
+              + 카페 추가
+            </button>
+          </div>
+          <table className={styles.trackingTable}>
+            <thead>
+              <tr>
+                <th>카페명</th>
+                <th>카페 ID</th>
+                <th>추적 링크</th>
+                <th>복사</th>
+                <th>삭제</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cafes
+                .filter(c => !cafeSearchText || c.name.includes(cafeSearchText) || c.id.includes(cafeSearchText))
+                .map(cafe => {
+                  const link = `https://barosocial.vercel.app/mamcafe/${cafe.id}`;
+                  return (
+                    <tr key={cafe.id}>
+                      <td>{cafe.name}</td>
+                      <td><code className={styles.cafeIdCode}>{cafe.id}</code></td>
+                      <td><span className={styles.trackingLink}>{link}</span></td>
+                      <td>
+                        <button
+                          type="button"
+                          className={`${styles.copyBtn} ${copiedId === cafe.id ? styles.copyBtnDone : ''}`}
+                          onClick={() => handleCopyLink(cafe.id)}
+                        >{copiedId === cafe.id ? '복사됨!' : '복사'}</button>
+                      </td>
+                      <td>
+                        <button type="button" className={styles.deleteCafeBtn} onClick={() => handleDeleteCafe(cafe.id)}>삭제</button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              {cafes.filter(c => !cafeSearchText || c.name.includes(cafeSearchText) || c.id.includes(cafeSearchText)).length === 0 && (
+                <tr><td colSpan={5} className={styles.empty}>검색 결과가 없습니다.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* 카페 추가 모달 */}
+      {showAddCafeModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowAddCafeModal(false)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>맘카페 추가</h2>
+            <div className={styles.formGroup}>
+              <label>카페 이름</label>
+              <input
+                type="text"
+                placeholder="예: 순광맘"
+                value={newCafeName}
+                onChange={e => setNewCafeName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddCafe(e); } }}
+                autoFocus
+              />
+            </div>
+            <div className={styles.formGroup} style={{ marginTop: 16 }}>
+              <label>카페 ID 또는 네이버 카페 URL</label>
+              <div className={styles.cafeIdInputRow}>
+                <input
+                  type="text"
+                  placeholder="예: cjsam  또는  https://cafe.naver.com/cjsam"
+                  value={newCafeId}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val.includes('cafe.naver.com/')) {
+                      const extracted = val.split('cafe.naver.com/')[1]?.split('/')[0]?.split('?')[0] || '';
+                      setNewCafeId(extracted);
+                    } else {
+                      setNewCafeId(val.trim());
+                    }
+                  }}
+                  onBlur={() => lookupCafeName(newCafeId.trim())}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); lookupCafeName(newCafeId.trim()); } }}
+                />
+                <button
+                  type="button"
+                  className={styles.lookupBtn}
+                  onClick={() => lookupCafeName(newCafeId.trim())}
+                  disabled={!newCafeId || cafeLookupLoading}
+                >
+                  {cafeLookupLoading ? '조회중...' : '이름 조회'}
+                </button>
+              </div>
+              {newCafeId && (
+                <div className={styles.trackingPreview}>
+                  생성될 링크: <span>https://barosocial.vercel.app/mamcafe/{newCafeId.trim()}</span>
+                </div>
+              )}
+            </div>
+            <div className={styles.modalActions}>
+              <button type="button" onClick={e => handleAddCafe(e)} className={styles.submitButton}>추가</button>
+              <button type="button" onClick={() => setShowAddCafeModal(false)} className={styles.cancelButton}>취소</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'consultations' && (loading ? (
         <div className={styles.loading}>로딩 중...</div>
       ) : error ? (
         <div className={styles.errorMessage}>{error}</div>
@@ -933,17 +1123,32 @@ export default function AdminPage() {
                     onChange={toggleSelectAll}
                   />
                 </th>
-                {/* 유입경로 */}
-                <th className={`${styles.thFilterable} ${(majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all') ? styles.thFiltered : ''}`}>
+                {/* 대분류 */}
+                <th className={`${styles.thFilterable} ${majorCategoryFilter !== 'all' ? styles.thFiltered : ''}`}>
                   <div className={styles.thInner}>
-                    <span>유입 경로</span>
+                    <span>대분류</span>
                     <button
-                      className={`${styles.thFilterBtn} ${(majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all') ? styles.thFilterBtnActive : ''}`}
+                      className={`${styles.thFilterBtn} ${majorCategoryFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
                         setDropdownPos({ top: rect.bottom + 4, left: rect.left });
-                        setOpenFilterColumn(openFilterColumn === 'source' ? null : 'source');
+                        setOpenFilterColumn(openFilterColumn === 'major' ? null : 'major');
+                      }}
+                    >▾</button>
+                  </div>
+                </th>
+                {/* 중분류 */}
+                <th className={`${styles.thFilterable} ${minorCategoryFilter !== 'all' ? styles.thFiltered : ''}`}>
+                  <div className={styles.thInner}>
+                    <span>중분류</span>
+                    <button
+                      className={`${styles.thFilterBtn} ${minorCategoryFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                        setOpenFilterColumn(openFilterColumn === 'minor' ? null : 'minor');
                       }}
                     >▾</button>
                   </div>
@@ -1021,7 +1226,7 @@ export default function AdminPage() {
             <tbody>
               {paginatedConsultations.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className={styles.empty}>
+                  <td colSpan={13} className={styles.empty}>
                     신청 내역이 없습니다.
                   </td>
                 </tr>
@@ -1035,7 +1240,8 @@ export default function AdminPage() {
                         onChange={() => toggleSelect(consultation.id)}
                       />
                     </td>
-                    <td>{highlightText(parseClickSource(consultation.click_source).display, searchText) || '-'}</td>
+                    <td>{highlightText(parseClickSource(consultation.click_source).major, searchText) || '-'}</td>
+                    <td>{highlightText(parseClickSource(consultation.click_source).minor, searchText) || '-'}</td>
                     <td>{highlightText(consultation.name, searchText)}</td>
                     <td>{highlightContact(consultation.contact, searchText)}</td>
                     <td>{consultation.education || '-'}</td>
@@ -1147,7 +1353,7 @@ export default function AdminPage() {
             </div>
           )}
         </div>
-      )}
+      ))}
 
       {/* 수동 추가 모달 */}
       {showAddModal && (
@@ -1202,7 +1408,7 @@ export default function AdminPage() {
               <div className={styles.formGroup}>
                 <label>취득사유 (복수 선택 가능)</label>
                 <div className={styles.checkboxGroup}>
-                  {['즉시취업', '이직', '미래', '취미', '준비'].map((opt) => {
+                  {['즉시취업', '이직', '미래준비', '취업'].map((opt) => {
                     const selected = formData.reason.split(', ').filter(Boolean).includes(opt);
                     return (
                       <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
@@ -1329,7 +1535,7 @@ export default function AdminPage() {
               <div className={styles.formGroup}>
                 <label>취득사유 (복수 선택 가능)</label>
                 <div className={styles.checkboxGroup}>
-                  {['즉시취업', '이직', '미래', '취미', '준비'].map((opt) => {
+                  {['즉시취업', '이직', '미래준비', '취업'].map((opt) => {
                     const selected = formData.reason.split(', ').filter(Boolean).includes(opt);
                     return (
                       <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
@@ -1457,7 +1663,7 @@ export default function AdminPage() {
             <div className={styles.formGroup}>
               <label>취득사유 (복수 선택 가능)</label>
               <div className={styles.checkboxGroup}>
-                {['즉시취업', '이직', '미래', '취미', '준비'].map((opt) => {
+                {['즉시취업', '이직', '미래준비', '취업'].map((opt) => {
                   const selected = reasonText.split(', ').filter(Boolean).includes(opt);
                   return (
                     <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
@@ -1628,31 +1834,27 @@ export default function AdminPage() {
           style={{ top: dropdownPos.top, left: dropdownPos.left }}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          {openFilterColumn === 'source' && (
-            <>
-              <div className={styles.thFilterSection}>
-                <div className={styles.thFilterSectionTitle}>대분류</div>
-                {['all', ...uniqueMajorCategories].map(cat => (
-                  <div
-                    key={cat}
-                    className={`${styles.thFilterItem} ${majorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
-                    onClick={() => { setMajorCategoryFilter(cat); setMinorCategoryFilter('all'); setCurrentPage(1); }}
-                  >{cat === 'all' ? '전체' : cat}</div>
-                ))}
-              </div>
-              {majorCategoryFilter !== 'all' && uniqueMinorCategories.length > 0 && (
-                <div className={styles.thFilterSection}>
-                  <div className={styles.thFilterSectionTitle}>중분류</div>
-                  {['all', ...uniqueMinorCategories].map(cat => (
-                    <div
-                      key={cat}
-                      className={`${styles.thFilterItem} ${minorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
-                      onClick={() => { setMinorCategoryFilter(cat); setCurrentPage(1); }}
-                    >{cat === 'all' ? '전체' : cat}</div>
-                  ))}
-                </div>
-              )}
-            </>
+          {openFilterColumn === 'major' && (
+            <div className={styles.thFilterSection}>
+              {['all', ...uniqueMajorCategories].map(cat => (
+                <div
+                  key={cat}
+                  className={`${styles.thFilterItem} ${majorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setMajorCategoryFilter(cat); setMinorCategoryFilter('all'); setCurrentPage(1); setOpenFilterColumn(null); }}
+                >{cat === 'all' ? '전체' : cat}</div>
+              ))}
+            </div>
+          )}
+          {openFilterColumn === 'minor' && (
+            <div className={styles.thFilterSection}>
+              {['all', ...uniqueMinorCategories].map(cat => (
+                <div
+                  key={cat}
+                  className={`${styles.thFilterItem} ${minorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setMinorCategoryFilter(cat); setCurrentPage(1); setOpenFilterColumn(null); }}
+                >{cat === 'all' ? '전체' : cat}</div>
+              ))}
+            </div>
           )}
           {openFilterColumn === 'manager' && (
             <div className={styles.thFilterSection}>

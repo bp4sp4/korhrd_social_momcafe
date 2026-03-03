@@ -957,6 +957,219 @@
   font-weight: 600;
 }
 
+/* 탭 네비게이션 */
+.tabNav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tabBtn {
+  padding: 10px 24px;
+  border: 1.5px solid #e5e8eb;
+  border-radius: 10px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: #8b95a1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabBtn:hover {
+  border-color: #3182f6;
+  color: #3182f6;
+}
+
+.tabBtnActive {
+  background: #3182f6;
+  border-color: #3182f6;
+  color: white;
+}
+
+.tabBtnActive:hover {
+  background: #1b64da;
+  border-color: #1b64da;
+  color: white;
+}
+
+/* 추적링크 관리 */
+.trackingContainer {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+  padding: 28px;
+}
+
+.trackingToolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.trackingSearchInput {
+  padding: 10px 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 200px;
+  transition: all 0.2s;
+}
+
+.trackingSearchInput:focus {
+  outline: none;
+  border-color: #3182f6;
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+}
+
+.trackingCount {
+  font-size: 13px;
+  color: #8b95a1;
+  white-space: nowrap;
+}
+
+.trackingPreview {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #8b95a1;
+}
+
+.trackingPreview span {
+  color: #3182f6;
+  font-family: monospace;
+}
+
+.cafeIdInputRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cafeIdInputRow input {
+  flex: 1;
+}
+
+.lookupBtn {
+  padding: 12px 16px;
+  border: 1.5px solid #3182f6;
+  border-radius: 12px;
+  background: white;
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.lookupBtn:hover:not(:disabled) {
+  background: #3182f6;
+  color: white;
+}
+
+.lookupBtn:disabled {
+  border-color: #d1d6db;
+  color: #b0b8c1;
+  cursor: not-allowed;
+}
+
+.trackingTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.trackingTable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4e5968;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e8eb;
+}
+
+.trackingTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f2f4f6;
+  font-size: 14px;
+  color: #191f28;
+  vertical-align: middle;
+}
+
+.trackingTable tbody tr:hover {
+  background: #fafbfc;
+}
+
+.cafeIdCode {
+  background: #f2f4f6;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: monospace;
+  color: #4e5968;
+}
+
+.trackingLink {
+  font-size: 13px;
+  color: #3182f6;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.copyBtn {
+  padding: 7px 16px;
+  border: 1.5px solid #3182f6;
+  border-radius: 8px;
+  background: white;
+  color: #3182f6;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.copyBtn:hover {
+  background: #3182f6;
+  color: white;
+}
+
+.copyBtnDone {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.copyBtnDone:hover {
+  background: #059669;
+  border-color: #059669;
+  color: white;
+}
+
+.deleteCafeBtn {
+  padding: 7px 14px;
+  border: 1.5px solid #f04452;
+  border-radius: 8px;
+  background: white;
+  color: #f04452;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteCafeBtn:hover {
+  background: #f04452;
+  color: white;
+}
+
+.thFilterBtnActive {
+  background: #3182f6;
+}
+
 .thFilterItemSelected::before {
   background: #3182f6;
   border-color: #3182f6;
