@@ -77,9 +77,13 @@ function ClickSourceHandler({
       );
       onSourceChange(formatted);
     } else {
-      // UTM 없을 때 referrer로 네이버카페 감지 (테스트)
+      // UTM 없을 때 referrer로 네이버카페 감지
       const referrer = document.referrer;
-      if (referrer.includes("cafe.naver.com")) {
+      if (referrer.includes("cafe.naver.com/redog2oi")) {
+        onSourceChange("맘카페_부천소사구");
+      } else if (referrer.includes("cafe.naver.com/babylovecafe")) {
+        onSourceChange("맘카페_양주시맘");
+      } else if (referrer.includes("cafe.naver.com")) {
         onSourceChange("네이버카페_referrer");
       }
     }
