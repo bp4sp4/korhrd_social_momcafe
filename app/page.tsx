@@ -84,7 +84,7 @@ function ClickSourceHandler({
       } else if (referrer.includes("cafe.naver.com/babylovecafe") || referrer.includes("clubid=12688726")) {
         onSourceChange("맘카페_양주시맘카페");
       } else if (referrer.includes("cafe.naver.com")) {
-        onSourceChange("네이버카페_referrer");
+        onSourceChange("네이버카페_" + referrer.replace("https://cafe.naver.com", "").slice(0, 50));
       }
     }
   }, [searchParams, onSourceChange]);
