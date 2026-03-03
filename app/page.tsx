@@ -76,6 +76,12 @@ function ClickSourceHandler({
         cafeId,
       );
       onSourceChange(formatted);
+    } else {
+      // UTM 없을 때 referrer로 네이버카페 감지 (테스트)
+      const referrer = document.referrer;
+      if (referrer.includes("cafe.naver.com")) {
+        onSourceChange("네이버카페_referrer");
+      }
     }
   }, [searchParams, onSourceChange]);
 
