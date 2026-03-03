@@ -1149,6 +1149,23 @@
   color: white;
 }
 
+.editCafeBtn {
+  padding: 7px 14px;
+  border: 1.5px solid #8b95a1;
+  border-radius: 8px;
+  background: white;
+  color: #4e5968;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editCafeBtn:hover {
+  border-color: #3182f6;
+  color: #3182f6;
+}
+
 .deleteCafeBtn {
   padding: 7px 14px;
   border: 1.5px solid #f04452;
@@ -1168,6 +1185,250 @@
 
 .thFilterBtnActive {
   background: #3182f6;
+}
+
+/* ─── 토스 스타일 드롭다운 (추가 모달) ─── */
+.tossDropdown {
+  position: relative;
+  width: 100%;
+}
+
+.tossDropdownTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  background: white;
+  font-size: 14px;
+  color: #191f28;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  gap: 8px;
+}
+
+.tossDropdownTrigger:hover {
+  border-color: #b0b8c1;
+}
+
+.tossDropdownTrigger:focus {
+  outline: none;
+  border-color: #3182f6;
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+}
+
+.tossDropdownPlaceholder {
+  color: #b0b8c1;
+}
+
+.tossDropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  z-index: 2000;
+  overflow: hidden;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.tossDropdownMenu::-webkit-scrollbar { width: 4px; }
+.tossDropdownMenu::-webkit-scrollbar-track { background: transparent; }
+.tossDropdownMenu::-webkit-scrollbar-thumb { background: #e5e8eb; border-radius: 2px; }
+
+.tossDropdownItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #191f28;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.tossDropdownItem:last-child {
+  border-bottom: none;
+}
+
+.tossDropdownItem:hover {
+  background: #f9fafb;
+}
+
+.tossDropdownItemActive {
+  color: #3182f6;
+  font-weight: 600;
+}
+
+/* 소스/학력/과정 chip 선택기 */
+.sourceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.sourceSubChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #f2f4f6;
+}
+
+.sourceChip {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e5e8eb;
+  background: #fff;
+  font-size: 13px;
+  color: #4e5968;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sourceChip:hover {
+  border-color: #3182f6;
+  color: #3182f6;
+}
+
+.sourceChipSelected {
+  border-color: #3182f6;
+  background: #eff6ff;
+  color: #3182f6;
+  font-weight: 600;
+}
+
+.sourceCustomInput {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #3182f6;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #191f28;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sourcePreview {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #8b95a1;
+  font-family: monospace;
+  padding: 4px 8px;
+  background: #f2f4f6;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.labelHint {
+  font-size: 12px;
+  color: #8b95a1;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+/* 직접 추가 폼 (맘카페) */
+.sourceAddForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 14px;
+  background: #f0f7ff;
+  border-radius: 10px;
+  border: 1.5px solid #3182f6;
+}
+
+.sourceAddInput {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #191f28;
+  outline: none;
+  box-sizing: border-box;
+  background: white;
+  transition: border-color 0.15s;
+}
+
+.sourceAddInput:focus {
+  border-color: #3182f6;
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+}
+
+.sourceAddInput::placeholder {
+  color: #b0b8c1;
+}
+
+.sourceAddBtn {
+  padding: 9px 16px;
+  background: #3182f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  align-self: flex-end;
+}
+
+.sourceAddBtn:hover:not(:disabled) {
+  background: #1b64da;
+}
+
+.sourceAddBtn:disabled {
+  background: #b0b8c1;
+  cursor: not-allowed;
+}
+
+/* 드롭다운 직접입력 항목 */
+.tossDropdownItemDirect {
+  color: #3182f6;
+  font-weight: 600;
+  border-top: 1px solid #f2f4f6;
+}
+
+/* 직접입력 텍스트필드 */
+.tossDirectInput {
+  margin-top: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #3182f6;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #191f28;
+  outline: none;
+  box-sizing: border-box;
+  background: #f0f7ff;
+  transition: border-color 0.15s;
+}
+
+.tossDirectInput::placeholder {
+  color: #b0b8c1;
+}
+
+.tossDirectInput:focus {
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
 }
 
 .thFilterItemSelected::before {

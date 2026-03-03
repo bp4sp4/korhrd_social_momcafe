@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.png",
-        width: 1200,
-        height: 630,
+        width: 800,
+        height: 540,
         alt: "한평생교육 무료상담",
       },
     ],

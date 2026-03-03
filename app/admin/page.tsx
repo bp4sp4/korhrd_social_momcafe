@@ -6,6 +6,9 @@ import { supabase } from '@/lib/supabase';
 import styles from './admin.module.css';
 import { CAFE_NAMES } from '@/lib/cafe-names';
 
+const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 졸업', '대학원 이상'];
+const ADMIN_COURSE_OPTIONS = ['사회복지사', '아동학사', '평생교육사', '편입/대학원', '건강가정사', '청소년지도사', '보육교사', '심리상담사'];
+
 type ConsultationStatus = '상담대기' | '상담중' | '보류' | '등록대기' | '등록완료';
 
 interface Consultation {
@@ -48,6 +51,10 @@ export default function AdminPage() {
   const [newCafeId, setNewCafeId] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showAddCafeModal, setShowAddCafeModal] = useState(false);
+  const [showEditCafeModal, setShowEditCafeModal] = useState(false);
+  const [editCafe, setEditCafe] = useState<{ id: string; name: string } | null>(null);
+  const [editCafeName, setEditCafeName] = useState('');
+  const [editCafeId, setEditCafeId] = useState('');
   const [cafeSearchText, setCafeSearchText] = useState('');
   const [cafeLookupLoading, setCafeLookupLoading] = useState(false);
     // 거주지 모달 열기/닫기
@@ -101,6 +108,20 @@ export default function AdminPage() {
   const [openFilterColumn, setOpenFilterColumn] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const addEduRef = useRef<HTMLDivElement>(null);
+  const addCourseRef = useRef<HTMLDivElement>(null);
+  // 추가 모달 - 토스 드롭다운 open 상태
+  const [addEduOpen, setAddEduOpen] = useState(false);
+  const [addCourseOpen, setAddCourseOpen] = useState(false);
+  const [addCourseDirectMode, setAddCourseDirectMode] = useState(false);
+  // 추가 모달 - 유입경로 선택
+  const [addSourceMajor, setAddSourceMajor] = useState('');
+  const [addSourceMinor, setAddSourceMinor] = useState('');
+  const [addSourceCustom, setAddSourceCustom] = useState('');
+  // 맘카페 직접입력
+  const [addMamcafeNewId, setAddMamcafeNewId] = useState('');
+  const [addMamcafeNewName, setAddMamcafeNewName] = useState('');
+  const [addMamcafeAdding, setAddMamcafeAdding] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -135,6 +156,70 @@ export default function AdminPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // 모달 열렸을 때 배경 스크롤 방지
+  useEffect(() => {
+    if (showAddModal || showAddCafeModal || showEditCafeModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [showAddModal, showAddCafeModal, showEditCafeModal]);
+
+  // 추가 모달 드롭다운 외부 클릭 닫기
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (addEduRef.current && !addEduRef.current.contains(e.target as Node)) setAddEduOpen(false);
+      if (addCourseRef.current && !addCourseRef.current.contains(e.target as Node)) setAddCourseOpen(false);
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, []);
+
+  // 맘카페 직접입력 → DB 등록 후 선택
+  const handleAddMamcafe = async () => {
+    const rawId = addMamcafeNewId.trim();
+    const name = addMamcafeNewName.trim();
+    if (!rawId || !name) { alert('카페 ID와 이름을 모두 입력해주세요.'); return; }
+    // 네이버 URL에서 ID 추출
+    const match = rawId.match(/(?:https?:\/\/)?(?:m\.)?cafe\.naver\.com\/([a-zA-Z0-9_]+)/);
+    const cafeId = match ? match[1] : rawId;
+    setAddMamcafeAdding(true);
+    try {
+      const res = await fetch('/api/channels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: cafeId, name, type: 'mamcafe' }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || '추가 실패');
+        return;
+      }
+      await fetchCafes(); // 카페탭에도 즉시 반영
+      setAddSourceMinor(cafeId);
+      setAddMamcafeNewId('');
+      setAddMamcafeNewName('');
+      applyAddSource('맘카페', cafeId, '');
+    } catch {
+      alert('카페 추가에 실패했습니다.');
+    } finally {
+      setAddMamcafeAdding(false);
+    }
+  };
+
+  // 유입경로 적용
+  const applyAddSource = (major: string, minor: string, custom: string) => {
+    if (!major) { setFormData(prev => ({ ...prev, click_source: '' })); return; }
+    if (minor && minor !== '직접입력') {
+      setFormData(prev => ({ ...prev, click_source: `${major}_${minor}` }));
+    } else if (minor === '직접입력' && custom) {
+      setFormData(prev => ({ ...prev, click_source: `${major}_${custom}` }));
+    } else {
+      setFormData(prev => ({ ...prev, click_source: major }));
+    }
+  };
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -182,6 +267,27 @@ export default function AdminPage() {
   const handleDeleteCafe = async (id: string) => {
     if (!confirm('삭제하시겠습니까?')) return;
     await fetch(`/api/channels?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+    fetchCafes();
+  };
+
+  const handleEditCafe = async () => {
+    if (!editCafe) return;
+    if (!editCafeName.trim()) { alert('이름을 입력해주세요.'); return; }
+    if (!editCafeId.trim()) { alert('카페 ID를 입력해주세요.'); return; }
+    const res = await fetch('/api/channels', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: editCafe.id, newId: editCafeId.trim(), name: editCafeName.trim() }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.error || '수정 실패');
+      return;
+    }
+    setShowEditCafeModal(false);
+    setEditCafe(null);
+    setEditCafeName('');
+    setEditCafeId('');
     fetchCafes();
   };
 
@@ -307,6 +413,12 @@ export default function AdminPage() {
         manager: '',
         residence: ''
       });
+      setAddSourceMajor('');
+      setAddSourceMinor('');
+      setAddSourceCustom('');
+      setAddMamcafeNewId('');
+      setAddMamcafeNewName('');
+      setAddCourseDirectMode(false);
       setShowAddModal(false);
       fetchConsultations();
     } catch (error) {
@@ -1002,6 +1114,7 @@ export default function AdminPage() {
                 <th>카페 ID</th>
                 <th>추적 링크</th>
                 <th>복사</th>
+                <th>수정</th>
                 <th>삭제</th>
               </tr>
             </thead>
@@ -1023,16 +1136,58 @@ export default function AdminPage() {
                         >{copiedId === cafe.id ? '복사됨!' : '복사'}</button>
                       </td>
                       <td>
+                        <button type="button" className={styles.editCafeBtn} onClick={() => {
+                          setEditCafe({ id: cafe.id, name: cafe.name });
+                          setEditCafeId(cafe.id);
+                          setEditCafeName(cafe.name);
+                          setShowEditCafeModal(true);
+                        }}>수정</button>
+                      </td>
+                      <td>
                         <button type="button" className={styles.deleteCafeBtn} onClick={() => handleDeleteCafe(cafe.id)}>삭제</button>
                       </td>
                     </tr>
                   );
                 })}
               {cafes.filter(c => !cafeSearchText || c.name.includes(cafeSearchText) || c.id.includes(cafeSearchText)).length === 0 && (
-                <tr><td colSpan={5} className={styles.empty}>검색 결과가 없습니다.</td></tr>
+                <tr><td colSpan={6} className={styles.empty}>검색 결과가 없습니다.</td></tr>
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* 카페 수정 모달 */}
+      {showEditCafeModal && editCafe && (
+        <div className={styles.modalOverlay} onClick={() => setShowEditCafeModal(false)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>카페 수정</h2>
+            <div className={styles.formGroup}>
+              <label>카페 ID</label>
+              <input
+                type="text"
+                value={editCafeId}
+                onChange={e => setEditCafeId(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleEditCafe(); }}
+                placeholder="카페 ID"
+                autoFocus
+              />
+            </div>
+            <div className={styles.formGroup} style={{ marginTop: 16 }}>
+              <label>카페 이름</label>
+              <input
+                type="text"
+                value={editCafeName}
+                onChange={e => setEditCafeName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleEditCafe(); }}
+                placeholder="카페 이름 입력"
+              />
+            </div>
+            <div className={styles.modalActions}>
+              <button type="button" onClick={handleEditCafe} className={styles.submitButton}>저장</button>
+              <button type="button" onClick={() => setShowEditCafeModal(false)} className={styles.cancelButton}>취소</button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -1369,28 +1524,92 @@ export default function AdminPage() {
                   maxLength={13}
                 />
               </div>
+              {/* 최종학력 - 토스 드롭다운 */}
               <div className={styles.formGroup}>
                 <label>최종학력</label>
-                <select
-                  value={formData.education}
-                  onChange={(e) => setFormData({ ...formData, education: e.target.value })}
-                >
-                  <option value="">선택하세요 (선택사항)</option>
-                  <option value="고등학교 졸업">고등학교 졸업</option>
-                  <option value="전문대 졸업">전문대 졸업</option>
-                  <option value="대학교 재학">대학교 재학</option>
-                  <option value="대학교 졸업">대학교 졸업</option>
-                  <option value="대학원 이상">대학원 이상</option>
-                </select>
+                <div className={styles.tossDropdown} ref={addEduRef}>
+                  <button
+                    type="button"
+                    className={styles.tossDropdownTrigger}
+                    onClick={() => setAddEduOpen(o => !o)}
+                  >
+                    <span className={formData.education ? '' : styles.tossDropdownPlaceholder}>
+                      {formData.education || '선택하세요 (선택사항)'}
+                    </span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d={addEduOpen ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'} stroke="#8b95a1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {addEduOpen && (
+                    <div className={styles.tossDropdownMenu}>
+                      <button type="button" className={`${styles.tossDropdownItem} ${!formData.education ? styles.tossDropdownItemActive : ''}`}
+                        onClick={() => { setFormData(p => ({ ...p, education: '' })); setAddEduOpen(false); }}>
+                        <span>선택 안 함</span>
+                        {!formData.education && <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4 8-8" stroke="#3182f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </button>
+                      {EDUCATION_OPTIONS.map(opt => (
+                        <button type="button" key={opt}
+                          className={`${styles.tossDropdownItem} ${formData.education === opt ? styles.tossDropdownItemActive : ''}`}
+                          onClick={() => { setFormData(p => ({ ...p, education: opt })); setAddEduOpen(false); }}>
+                          <span>{opt}</span>
+                          {formData.education === opt && <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4 8-8" stroke="#3182f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
+              {/* 희망과정 - 토스 드롭다운 */}
               <div className={styles.formGroup}>
                 <label>희망과정</label>
-                <input
-                  type="text"
-                  value={formData.hope_course}
-                  onChange={(e) => setFormData({ ...formData, hope_course: e.target.value })}
-                  placeholder="희망과정을 입력하세요 (선택사항)"
-                />
+                <div className={styles.tossDropdown} ref={addCourseRef}>
+                  <button
+                    type="button"
+                    className={styles.tossDropdownTrigger}
+                    onClick={() => setAddCourseOpen(o => !o)}
+                  >
+                    <span className={formData.hope_course ? '' : styles.tossDropdownPlaceholder}>
+                      {formData.hope_course || '선택하세요 (선택사항)'}
+                    </span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d={addCourseOpen ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'} stroke="#8b95a1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {addCourseOpen && (
+                    <div className={styles.tossDropdownMenu}>
+                      <button type="button" className={`${styles.tossDropdownItem} ${!formData.hope_course && !addCourseDirectMode ? styles.tossDropdownItemActive : ''}`}
+                        onClick={() => { setFormData(p => ({ ...p, hope_course: '' })); setAddCourseDirectMode(false); setAddCourseOpen(false); }}>
+                        <span>선택 안 함</span>
+                        {!formData.hope_course && !addCourseDirectMode && <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4 8-8" stroke="#3182f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </button>
+                      {ADMIN_COURSE_OPTIONS.map(opt => (
+                        <button type="button" key={opt}
+                          className={`${styles.tossDropdownItem} ${formData.hope_course === opt && !addCourseDirectMode ? styles.tossDropdownItemActive : ''}`}
+                          onClick={() => { setFormData(p => ({ ...p, hope_course: opt })); setAddCourseDirectMode(false); setAddCourseOpen(false); }}>
+                          <span>{opt}</span>
+                          {formData.hope_course === opt && <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M1 5l4 4 8-8" stroke="#3182f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        </button>
+                      ))}
+                      <button type="button"
+                        className={`${styles.tossDropdownItem} ${styles.tossDropdownItemDirect}`}
+                        onClick={() => { setFormData(p => ({ ...p, hope_course: '' })); setAddCourseDirectMode(true); setAddCourseOpen(false); }}
+                      >
+                        <span>직접 입력...</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* 직접 입력 모드 */}
+                {addCourseDirectMode && (
+                  <input
+                    type="text"
+                    className={styles.tossDirectInput}
+                    value={formData.hope_course}
+                    placeholder="희망과정 직접 입력"
+                    autoFocus
+                    onChange={e => setFormData(p => ({ ...p, hope_course: e.target.value }))}
+                  />
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label>취득사유 (복수 선택 가능)</label>
@@ -1415,30 +1634,118 @@ export default function AdminPage() {
                   })}
                 </div>
               </div>
+              {/* 유입경로 - 칩 2단계 선택 */}
               <div className={styles.formGroup}>
                 <label>유입 경로</label>
-                <input
-                  type="text"
-                  list="clickSourceOptions"
-                  value={formData.click_source}
-                  onChange={(e) => setFormData({ ...formData, click_source: e.target.value })}
-                  placeholder="예: 당근_당근채팅, 네이버_검색 등 (선택사항)"
-                />
-                <datalist id="clickSourceOptions">
-                  <option value="당근" />
-                  <option value="당근채팅" />
-                  <option value="대표전화(당근)" />
-                  <option value="맘카페_순광맘" />
-                  <option value="맘카페_러브양산맘" />
-                  <option value="맘카페_창원진해댁" />
-                  <option value="맘카페_광주맘스팡" />
-                  <option value="맘카페_충주아사모" />
-                  <option value="맘카페_화성남양애" />
-                  <option value="맘카페_율하맘" />
-                  <option value="맘카페_춘천맘" />
-                  <option value="맘카페_서산맘" />
-                  <option value="맘카페_부천소사구" />
-                </datalist>
+                <div className={styles.sourceChips}>
+                  {['당근', '맘카페', '네이버', '인스타', '유튜브', '카카오', '페이스북', '기타'].map(m => (
+                    <button type="button" key={m}
+                      className={`${styles.sourceChip} ${addSourceMajor === m ? styles.sourceChipSelected : ''}`}
+                      onClick={() => {
+                        const newMajor = addSourceMajor === m ? '' : m;
+                        setAddSourceMajor(newMajor);
+                        setAddSourceMinor('');
+                        setAddSourceCustom('');
+                        applyAddSource(newMajor, '', '');
+                      }}>{m}</button>
+                  ))}
+                </div>
+                {/* 맘카페 서브 */}
+                {addSourceMajor === '맘카페' && (
+                  <div className={styles.sourceSubChips}>
+                    {cafes.map(c => (
+                      <button type="button" key={c.id}
+                        className={`${styles.sourceChip} ${addSourceMinor === c.id ? styles.sourceChipSelected : ''}`}
+                        onClick={() => {
+                          const newMinor = addSourceMinor === c.id ? '' : c.id;
+                          setAddSourceMinor(newMinor);
+                          setAddSourceCustom('');
+                          setAddMamcafeNewId('');
+                          setAddMamcafeNewName('');
+                          applyAddSource('맘카페', newMinor, '');
+                        }}>{c.name.startsWith('http') ? c.id : c.name}</button>
+                    ))}
+                    <button type="button"
+                      className={`${styles.sourceChip} ${addSourceMinor === '직접입력' ? styles.sourceChipSelected : ''}`}
+                      onClick={() => {
+                        setAddSourceMinor(addSourceMinor === '직접입력' ? '' : '직접입력');
+                        setAddMamcafeNewId('');
+                        setAddMamcafeNewName('');
+                        applyAddSource('맘카페', '', '');
+                      }}>+ 직접 추가</button>
+                  </div>
+                )}
+                {addSourceMajor === '맘카페' && addSourceMinor === '직접입력' && (
+                  <div className={styles.sourceAddForm}>
+                    <input
+                      type="text"
+                      className={styles.sourceAddInput}
+                      value={addMamcafeNewId}
+                      placeholder="카페 ID 또는 네이버 카페 URL"
+                      onChange={async e => {
+                        const val = e.target.value;
+                        setAddMamcafeNewId(val);
+                        // 네이버 URL 붙여넣기 시 자동 카페명 조회
+                        if (val.includes('cafe.naver.com')) {
+                          try {
+                            const res = await fetch(`/api/cafe-lookup?url=${encodeURIComponent(val)}`);
+                            const data = await res.json();
+                            if (data.name) setAddMamcafeNewName(data.name);
+                          } catch {}
+                        }
+                      }}
+                    />
+                    <input
+                      type="text"
+                      className={styles.sourceAddInput}
+                      value={addMamcafeNewName}
+                      placeholder="카페 이름 (예: 순광맘)"
+                      onChange={e => setAddMamcafeNewName(e.target.value)}
+                    />
+                    <button type="button" className={styles.sourceAddBtn}
+                      onClick={handleAddMamcafe}
+                      disabled={addMamcafeAdding}>
+                      {addMamcafeAdding ? '추가 중...' : '카페 추가'}
+                    </button>
+                  </div>
+                )}
+                {/* 당근 서브 */}
+                {addSourceMajor === '당근' && (
+                  <div className={styles.sourceSubChips}>
+                    {['당근채팅', '대표전화(당근)'].map(opt => (
+                      <button type="button" key={opt}
+                        className={`${styles.sourceChip} ${addSourceMinor === opt ? styles.sourceChipSelected : ''}`}
+                        onClick={() => {
+                          const newMinor = addSourceMinor === opt ? '' : opt;
+                          setAddSourceMinor(newMinor);
+                          setAddSourceCustom('');
+                          applyAddSource('당근', newMinor, '');
+                        }}>{opt}</button>
+                    ))}
+                    <button type="button"
+                      className={`${styles.sourceChip} ${addSourceMinor === '직접입력' ? styles.sourceChipSelected : ''}`}
+                      onClick={() => {
+                        setAddSourceMinor('직접입력');
+                        setAddSourceCustom('');
+                        applyAddSource('당근', '', '');
+                      }}>직접입력</button>
+                  </div>
+                )}
+                {addSourceMajor === '당근' && addSourceMinor === '직접입력' && (
+                  <input
+                    type="text"
+                    className={styles.sourceCustomInput}
+                    value={addSourceCustom}
+                    placeholder="당근 경로 입력 (예: 채팅, 전화 등)"
+                    onChange={e => {
+                      setAddSourceCustom(e.target.value);
+                      applyAddSource('당근', '직접입력', e.target.value);
+                    }}
+                  />
+                )}
+                {formData.click_source && (
+                  <span className={styles.sourcePreview}>{formData.click_source}</span>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label>과목비용</label>

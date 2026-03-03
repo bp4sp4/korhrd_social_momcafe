@@ -8,7 +8,8 @@
       "Bash(claude mcp list 2>/dev/null || echo \"no mcp list command\")",
       "Bash(npx tsc --noEmit 2>&1)",
       "Bash(npx next build 2>&1 | tail -20)",
-      "Bash(cat << 'EOF'\n-- Supabase SQL Editor에서 실행:\ncreate table if not exists channels \\(\n  id text primary key,\n  name text not null,\n  type text not null default 'mamcafe',\n  created_at timestamptz default now\\(\\)\n\\);\n\n-- 기존 데이터 초기 삽입\ninsert into channels \\(id, name, type\\) values\n  \\('cjsam', '순광맘', 'mamcafe'\\),\n  \\('chobomamy', '러브양산맘', 'mamcafe'\\),\n  \\('jinhaemam', '창원진해댁', 'mamcafe'\\),\n  \\('momspanggju', '광주맘스팡', 'mamcafe'\\),\n  \\('cjasm', '충주아사모', 'mamcafe'\\),\n  \\('mygodsend', '화성남양애', 'mamcafe'\\),\n  \\('yul2moms', '율하맘', 'mamcafe'\\),\n  \\('chbabymom', '춘천맘', 'mamcafe'\\),\n  \\('seosanmom', '서산맘', 'mamcafe'\\),\n  \\('redog2oi', '부천소사구', 'mamcafe'\\),\n  \\('ksn82599', '둔산맘', 'mamcafe'\\)\non conflict \\(id\\) do nothing;\nEOF\necho \"SQL ready\")"
+      "Bash(cat << 'EOF'\n-- Supabase SQL Editor에서 실행:\ncreate table if not exists channels \\(\n  id text primary key,\n  name text not null,\n  type text not null default 'mamcafe',\n  created_at timestamptz default now\\(\\)\n\\);\n\n-- 기존 데이터 초기 삽입\ninsert into channels \\(id, name, type\\) values\n  \\('cjsam', '순광맘', 'mamcafe'\\),\n  \\('chobomamy', '러브양산맘', 'mamcafe'\\),\n  \\('jinhaemam', '창원진해댁', 'mamcafe'\\),\n  \\('momspanggju', '광주맘스팡', 'mamcafe'\\),\n  \\('cjasm', '충주아사모', 'mamcafe'\\),\n  \\('mygodsend', '화성남양애', 'mamcafe'\\),\n  \\('yul2moms', '율하맘', 'mamcafe'\\),\n  \\('chbabymom', '춘천맘', 'mamcafe'\\),\n  \\('seosanmom', '서산맘', 'mamcafe'\\),\n  \\('redog2oi', '부천소사구', 'mamcafe'\\),\n  \\('ksn82599', '둔산맘', 'mamcafe'\\)\non conflict \\(id\\) do nothing;\nEOF\necho \"SQL ready\")",
+      "Bash(ls /Users/korhrd/Documents/GitHub/korhrdsocial/public/og* 2>/dev/null && file /Users/korhrd/Documents/GitHub/korhrdsocial/public/og-image.png)"
     ]
   }
 }
