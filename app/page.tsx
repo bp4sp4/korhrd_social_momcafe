@@ -81,7 +81,7 @@ function ClickSourceHandler({
       const referrer = document.referrer;
       if (referrer.includes("cafe.naver.com/redog2oi")) {
         onSourceChange("맘카페_부천소사구");
-      } else if (referrer.includes("cafe.naver.com/babylovecafe")) {
+      } else if (referrer.includes("cafe.naver.com/babylovecafe") || referrer.includes("clubid=12688726")) {
         onSourceChange("맘카페_양주시맘카페");
       } else if (referrer.includes("cafe.naver.com")) {
         onSourceChange("네이버카페_referrer");
