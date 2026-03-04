@@ -38,7 +38,7 @@ export async function GET() {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('private_cert_consultations')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     // Supabase에 데이터 저장
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('private_cert_consultations')
       .insert([
         {
           name,
@@ -200,17 +200,17 @@ export async function POST(request: NextRequest) {
       console.log('[SLACK] Slack 알림 전송 시도');
       try {
         const slackMessage = {
-          text: is_manual_entry 
-            ? '🆕 *관리자가 새로운 상담 신청을 추가했습니다*'
-            : '📝 *새로운 상담 신청이 접수되었습니다*',
+          text: is_manual_entry
+            ? '🆕 *관리자가 새로운 민간자격증 신청을 추가했습니다*'
+            : '📝 *새로운 민간자격증 신청이 접수되었습니다*',
           blocks: [
             {
               type: 'header',
               text: {
                 type: 'plain_text',
-                text: is_manual_entry 
-                  ? '🆕 관리자 추가 상담 신청'
-                  : '📝 새로운 상담 신청',
+                text: is_manual_entry
+                  ? '🆕 관리자 추가 민간자격증 신청'
+                  : '📝 새로운 민간자격증 신청',
               },
             },
             {
@@ -394,7 +394,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('private_cert_consultations')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -446,7 +446,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('private_cert_consultations')
       .delete()
       .in('id', ids)
       .select();
