@@ -148,23 +148,14 @@
 }
 
 .logoutFloating {
-  position: fixed;
-  top: 16px;
-  right: 20px;
-  z-index: 100;
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid #fdd;
-  background: white;
-  color: #f04452;
-  transition: all 0.2s;
+  display: none;
 }
 
-.logoutFloating:hover {
-  background: #fee;
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .addButton {

@@ -1014,9 +1014,11 @@ export default function AdminPage() {
   // 관리자 대시보드
   return (
     <div className={styles.container}>
-      <button onClick={handleLogout} className={styles.logoutFloating}>로그아웃</button>
       <header className={styles.header}>
-        <h1 className={styles.title}>상담 신청 관리 ({filteredConsultations.length}건)</h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>상담 신청 관리 ({filteredConsultations.length}건)</h1>
+          <button onClick={handleLogout} className={styles.logoutButton}>로그아웃</button>
+        </div>
         <div className={styles.filterRow}>
           <div className={styles.filterGroup}>
             <input
