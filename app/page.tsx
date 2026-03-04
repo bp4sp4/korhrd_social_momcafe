@@ -37,6 +37,7 @@ const formatClickSource = (
     momspanggju: "광주맘스팡",
     cjasm: "충주아사모",
     ksn82599: "둔산맘",
+    magic26: "안평맘스비",
   };
 
   const shortSource = sourceMap[utmSource] || utmSource;
@@ -79,11 +80,12 @@ function ClickSourceHandler({
     } else {
       // referrer로 네이버카페 감지
       const referrer = document.referrer;
+      console.log('[referrer]', referrer);
       if (referrer.includes("cafe.naver.com/redog2oi")) {
         onSourceChange("맘카페_부천소사구");
       } else if (referrer.includes("cafe.naver.com/babylovecafe")) {
         onSourceChange("맘카페_베이비러브");
-      } else if (referrer.includes("cafe.naver.com/magic26")) {
+      } else if (referrer.includes("cafe.naver.com/magic26") || referrer.includes("cafes/20091703")) {
         onSourceChange("맘카페_안평맘스비");
       } else if (referrer.includes("cafe.naver.com/chobomamy")) {
         onSourceChange("맘카페_러브양산맘");
