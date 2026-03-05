@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./stepflow.module.css";
@@ -124,8 +124,65 @@ function ClickSourceHandler({
 
 const CERT_CATEGORIES = [
   {
-    label: "병원과정",
-    options: ["병원동행매니저1급", "병원코디네이터1급", "생활지원사1급"],
+    label: "전체과정",
+    options: [
+      "병원동행매니저1급",
+      "노인돌봄생활지원사1급",
+      "방과후돌봄교실지도사1급",
+      "바리스타1급",
+      "타로심리상담사1급",
+      "심리상담사1급",
+      "아동요리지도사1급",
+      "노인심리상담사1급",
+      "다문화심리상담사1급",
+      "독서논술지도사1급",
+      "독서지도사1급",
+      "동화구연지도사1급",
+      "디지털중독예방지도사1급",
+      "미술심리상담사1급",
+      "미술심리상담사2급",
+      "방과후수학지도사1급",
+      "스토리텔링수학지도사1급",
+      "방과후아동지도사1급",
+      "방과후학교지도사1급",
+      "병원코디네이터1급",
+      "부동산권리분석사1급",
+      "부모교육상담사1급",
+      "북아트1급",
+      "산모신생아건강관리사",
+      "산후관리사",
+      "손유희지도사1급",
+      "스피치지도사1급",
+      "실버인지활동지도사1급",
+      "심리분석사1급",
+      "아동공예지도자",
+      "아동미술심리상담사",
+      "아동미술지도사",
+      "아동미술심리상담사1급",
+      "안전교육지도사",
+      "안전관리사",
+      "안전교육지도사1급",
+      "영어동화구연지도사",
+      "유튜브크리에이터",
+      "음악심리상담사",
+      "이미지메이킹스피치",
+      "인성지도사1급",
+      "인성지도사2급",
+      "자기주도학습지도사1급",
+      "자기주도학습지도사2급",
+      "자원봉사지도사1급",
+      "종이접기지도사",
+      "지역아동교육지도사1급",
+      "진로적성상담사1급",
+      "코딩지도사",
+      "클레이아트지도사",
+      "프레젠테이션스피치",
+      "학교폭력예방상담사1급",
+      "NIE지도사1급",
+      "교육마술지도사1급",
+      "POP디자인지도사",
+      "SNS마케팅전문가",
+    ],
   },
   {
     label: "실버과정",
@@ -207,6 +264,16 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showCertModal, setShowCertModal] = useState(false);
   const [selectedCategoryIdx, setSelectedCategoryIdx] = useState(0);
+  const [showModalArrow, setShowModalArrow] = useState(true);
+  const certListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (showCertModal) setShowModalArrow(true);
+  }, [showCertModal, selectedCategoryIdx]);
+
+  const handleCertListScroll = () => {
+    if ((certListRef.current?.scrollTop ?? 0) > 10) setShowModalArrow(false);
+  };
 
   const selectedCerts = formData.hope_course
     ? formData.hope_course.split(", ").filter(Boolean)
@@ -582,7 +649,12 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
               {/* 우측: 자격증 목록 */}
               <div className={styles.certSelectAreaWrapper}>
-                <div className={styles.certListWrapper}>
+                <div
+                  className={styles.certListWrapper}
+                  ref={certListRef}
+                  onScroll={handleCertListScroll}
+                  style={{ position: "relative" }}
+                >
                   <div className={styles.certCategorySection}>
                     <div className={styles.certListContainer}>
                       <button
@@ -605,6 +677,44 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                     </div>
                   </div>
                 </div>
+                <AnimatePresence>
+                  {showModalArrow && (
+                    <motion.div
+                      key="modal-arrow"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      style={{
+                        position: "sticky",
+                        bottom: 0,
+                        display: "flex",
+                        justifyContent: "center",
+                        pointerEvents: "none",
+                        paddingBottom: "4px",
+                        paddingRight : "30px"
+                      }}
+                    >
+                      <motion.div
+                        animate={{ y: [0, 6, 0] }}
+                        transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <svg
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#9ca3af"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
