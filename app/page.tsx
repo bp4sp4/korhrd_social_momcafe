@@ -787,8 +787,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
-                  필수 - 이름, 연락처(휴대전화번호), 희망과정<br/>
-                  선택 - 취득사유
+                  필수 - 이름, 연락처(휴대전화번호), 희망과정, 취득사유, 맘카페 이름<br/>
+                  
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>
