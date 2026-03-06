@@ -32,7 +32,11 @@
       "Bash(find /Users/korhrd/Documents/GitHub/korhrdprivatecert -type f -name \"supabase*\" -o -name \"migrations*\" 2>/dev/null | grep -v node_modules)",
       "Bash(find /Users/korhrd/Documents/GitHub/korhrdprivatecert -type f -name \"*.ts\" -o -name \"*.tsx\" 2>/dev/null | grep -v node_modules | xargs grep -l \"private_cert_consultations\\\\|바로폼\" 2>/dev/null)",
       "Bash(cd /Users/korhrd/Documents/GitHub/korhrdsocial && npx tsc --noEmit 2>&1 | head -30)",
-      "Bash(npx tsc --noEmit --project /Users/korhrd/Documents/GitHub/korhrdsocial/tsconfig.json 2>&1 | head -30)"
+      "Bash(npx tsc --noEmit --project /Users/korhrd/Documents/GitHub/korhrdsocial/tsconfig.json 2>&1 | head -30)",
+      "Bash(npx next --version 2>&1)",
+      "Bash(node -e \"require\\('./node_modules/next'\\)\" 2>&1 && echo \"OK\")",
+      "Bash(grep -rl \"mamcafe_activity\\\\|click_source\\\\|중분류\\\\|formatClickSource\" /Users/korhrd/Documents/GitHub/korhrdsocial --include=\"*.tsx\" --include=\"*.ts\" 2>/dev/null | grep -v node_modules | grep -v .next)",
+      "Bash(git remote set-url origin https://github.com/bp4sp4/korhrd_privatecert.git && git remote -v)"
     ]
   }
 }

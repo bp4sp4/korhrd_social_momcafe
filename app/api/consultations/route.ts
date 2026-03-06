@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { sendConsultationEmail } from '@/lib/email';
-import { formatClickSource as formatClickSourceStatic } from '@/lib/cafe-names';
+import { formatClickSource as formatClickSourceStatic, CAFE_NAMES, KNOWN_CAFE_NAMES } from '@/lib/cafe-names';
 
 async function formatClickSourceFromDB(clickSource: string | null): Promise<string> {
   if (!clickSource) return '미입력';
@@ -13,8 +13,12 @@ async function formatClickSourceFromDB(clickSource: string | null): Promise<stri
     if (idx === -1) return stripped;
     const major = stripped.slice(0, idx);
     const rawMinor = stripped.slice(idx + 1);
-    const minor = map[rawMinor] || rawMinor;
-    return `${major} > ${minor}`;
+    const resolvedMinor = map[rawMinor] || CAFE_NAMES[rawMinor] || rawMinor;
+    // 맘카페 유입인데 알려진 카페 ID/이름과 다르면 확인필요 표시
+    if (major === '맘카페' && !map[rawMinor] && !CAFE_NAMES[rawMinor] && !KNOWN_CAFE_NAMES.has(rawMinor)) {
+      return `${major} > ${resolvedMinor}(확인필요)`;
+    }
+    return `${major} > ${resolvedMinor}`;
   } catch {
     return formatClickSourceStatic(clickSource);
   }
@@ -75,12 +79,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, major_category, reason, click_source, is_manual_entry, residence } = body;
+    const { name, contact, education, hope_course, major_category, reason, click_source, is_manual_entry, residence, mamcafe_activity } = body;
 
-    // 유효성 검사 - 이름과 연락처만 필수
-    if (!name || !contact) {
+    // 유효성 검사
+    if (!name || !contact || !reason || !mamcafe_activity) {
       return NextResponse.json(
-        { error: 'Name and contact are required' },
+        { error: 'Name, contact, reason, and mamcafe_activity are required' },
         { status: 400 }
       );
     }
@@ -98,6 +102,7 @@ export async function POST(request: NextRequest) {
           reason: reason || null,
           click_source: click_source || null,
           residence: residence || null,
+          mamcafe_activity: mamcafe_activity || null,
           status: '상담대기', // 기본 상태
         },
       ])
