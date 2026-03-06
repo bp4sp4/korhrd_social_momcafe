@@ -42,7 +42,7 @@ export async function GET() {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('private_cert_consultations')
+      .from('consultations')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -79,30 +79,28 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, major_category, reason, click_source, is_manual_entry, residence, mamcafe_activity } = body;
+    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence } = body;
 
     // 유효성 검사
-    if (!name || !contact || !reason || !mamcafe_activity) {
+    if (!name || !contact || !reason) {
       return NextResponse.json(
-        { error: 'Name, contact, reason, and mamcafe_activity are required' },
+        { error: 'Name, contact, and reason are required' },
         { status: 400 }
       );
     }
 
     // Supabase에 데이터 저장
     const { data, error } = await supabaseAdmin
-      .from('private_cert_consultations')
+      .from('consultations')
       .insert([
         {
           name,
           contact,
           education: education || null,
           hope_course: hope_course || null,
-          major_category: major_category || null,
           reason: reason || null,
           click_source: click_source || null,
           residence: residence || null,
-          mamcafe_activity: mamcafe_activity || null,
           status: '상담대기', // 기본 상태
         },
       ])
@@ -207,16 +205,16 @@ export async function POST(request: NextRequest) {
       try {
         const slackMessage = {
           text: is_manual_entry
-            ? '🆕 *관리자가 새로운 민간자격증 신청을 추가했습니다*'
-            : '📝 *새로운 민간자격증 신청이 접수되었습니다*',
+            ? '🆕 *관리자가 새로운 학점은행제 신청을 추가했습니다*'
+            : '📝 *새로운 학점은행제 신청이 접수되었습니다*',
           blocks: [
             {
               type: 'header',
               text: {
                 type: 'plain_text',
                 text: is_manual_entry
-                  ? '🆕 관리자 추가 민간자격증 신청'
-                  : '📝 새로운 민간자격증 신청',
+                  ? '🆕 관리자 추가 학점은행제 신청'
+                  : '📝 새로운 학점은행제 신청',
               },
             },
             {
@@ -400,7 +398,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('private_cert_consultations')
+      .from('consultations')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -452,7 +450,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('private_cert_consultations')
+      .from('consultations')
       .delete()
       .in('id', ids)
       .select();

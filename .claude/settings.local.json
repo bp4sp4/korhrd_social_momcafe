@@ -36,7 +36,13 @@
       "Bash(npx next --version 2>&1)",
       "Bash(node -e \"require\\('./node_modules/next'\\)\" 2>&1 && echo \"OK\")",
       "Bash(grep -rl \"mamcafe_activity\\\\|click_source\\\\|중분류\\\\|formatClickSource\" /Users/korhrd/Documents/GitHub/korhrdsocial --include=\"*.tsx\" --include=\"*.ts\" 2>/dev/null | grep -v node_modules | grep -v .next)",
-      "Bash(git remote set-url origin https://github.com/bp4sp4/korhrd_privatecert.git && git remote -v)"
+      "Bash(git remote set-url origin https://github.com/bp4sp4/korhrd_privatecert.git && git remote -v)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx tsc --noEmit --project /Users/korhrd/Documents/GitHub/korhrdsocial/tsconfig.json 2>&1 | head -50)",
+      "Bash(/Users/korhrd/Documents/GitHub/korhrdsocial/node_modules/.bin/tsc --noEmit --project /Users/korhrd/Documents/GitHub/korhrdsocial/tsconfig.json 2>&1 | head -50)",
+      "Bash(/Users/korhrd/Documents/GitHub/korhrdsocial/node_modules/.bin/tsc --noEmit --project /Users/korhrd/Documents/GitHub/korhrdsocial/tsconfig.json 2>&1)",
+      "Bash(/Users/korhrd/Documents/GitHub/korhrd_privatecert2/node_modules/.bin/tsc --noEmit --project /Users/korhrd/Documents/GitHub/korhrd_privatecert2/tsconfig.json 2>&1)",
+      "Bash(git remote set-url origin https://github.com/bp4sp4/korhrd_social_momcafe.git && git remote -v)"
     ]
   }
 }

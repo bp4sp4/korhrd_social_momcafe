@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-06T02:15:49.551Z",
+  "lastUpdated": "2026-03-06T04:40:35.261Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -37,7 +37,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-25T07:35:55.325Z",
-        "lastUpdated": "2026-03-05T01:30:17.482Z"
+        "lastUpdated": "2026-03-06T04:00:51.700Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/page.tsx"
     },
@@ -50,9 +50,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-27T02:01:42.335Z",
-        "lastUpdated": "2026-03-06T01:55:25.526Z"
+        "lastUpdated": "2026-03-06T03:55:47.317Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdprivatecert2/app/api/consultations/route.ts"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_privatecert2/app/api/consultations/route.ts"
     },
     "[id]": {
       "phase": "do",
@@ -115,7 +115,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-04T06:34:36.069Z",
-        "lastUpdated": "2026-03-06T02:11:22.030Z"
+        "lastUpdated": "2026-03-06T04:40:35.261Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/private-cert/page.tsx"
     },
@@ -154,7 +154,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-06T02:15:49.551Z"
+    "lastActivity": "2026-03-06T04:40:35.261Z"
   },
   "history": [
     {
@@ -1876,6 +1876,150 @@
     {
       "timestamp": "2026-03-06T02:15:49.551Z",
       "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:41:41.056Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:41:56.108Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:42:03.852Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:42:20.190Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:42:31.343Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:42:39.615Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:48:36.392Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:48:45.448Z",
+      "feature": "private-cert",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:52:11.184Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:52:16.206Z",
+      "feature": "private-cert",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:55:19.102Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:55:27.428Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:55:30.874Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:55:35.198Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:55:47.317Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:59:22.126Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:59:34.111Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:59:40.611Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T03:59:59.441Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T04:00:09.507Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T04:00:30.488Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T04:00:38.474Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T04:00:51.700Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-06T04:40:35.261Z",
+      "feature": "private-cert",
       "phase": "do",
       "action": "updated"
     }
