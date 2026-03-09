@@ -385,10 +385,11 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 </div>
                 <div className={styles.infoItem}>
                   <div className={styles.infoTitle}>
-                    <div className={styles.infoNumber}>1</div> 선착순 수업료 전액면제
+                    <div className={styles.infoNumber}>1</div> 1:1 맞춤 안내
                   </div>
                   <div className={styles.infoDesc}>
-                    원래 수업료 30만원 {"->"} 전액면제
+                    개인별 상황에 맞춰 조율 가능
+
                   </div>
                 </div>
                 <div className={styles.infoItem}>
