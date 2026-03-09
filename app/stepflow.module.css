@@ -428,34 +428,29 @@
 
 /* 자격증 선택 모달 - 바텀시트 */
 .certModalContainer {
-  border-radius: 16px;
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 -3px 7px 0 rgba(0, 0, 0, 0.10);
-  width: 100%;
-  max-width: 640px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  width: calc(100% - 32px);
+  max-width: 480px;
   max-height: 88vh;
-  min-height: 88vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  
 }
-
-
 
 .certModalHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
-  border-bottom: 1px solid #f2f4f6;
+  padding: 20px 20px 16px;
   flex-shrink: 0;
 }
 
 .certModalTitle {
   font-size: 18px;
   font-weight: 700;
-  color: #191f28;
+  color: #111827;
   margin: 0;
 }
 
@@ -468,170 +463,98 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #4e5968;
-  font-size: 18px;
   padding: 0;
 }
 
-.certModalBody {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.certCategoryList {
-  border-right: 1px solid #f2f4f6;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  background-color: #f6f7f9;
-  flex-shrink: 0;
-}
-
-.certCategoryItem {
-  padding: 16px 14px;
-  width: 110px;
-  cursor: pointer;
-  transition: all 0.15s;
-  user-select: none;
-  border-radius: 0;
-  flex-shrink: 0;
-  font-size: 14px;
-  background: none;
-  border: none;
-  text-align: left;
-  color: #6b7280;
-  font-weight: 500;
-  font-family: inherit;
-  line-height: 1.4;
-}
-
-.certCategoryItemActive {
-  background-color: #fff;
-  color: #0051ff;
-  font-weight: 700;
-}
-
-.certCategoryItemInactive {
-  background-color: #f6f7f9;
-  color: #4e5968;
-}
-
-.certSelectAreaWrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-}
-
-.certListWrapper {
+.certModalScrollBody {
   flex: 1;
   overflow-y: auto;
+  padding: 0 16px 8px;
 }
 
-.certCategorySection {
-  padding: 4px 0;
+.certModalSubtitle {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0 0 14px;
 }
 
-.certListContainer {
+.courseOptionList {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
-.certListItem {
-  padding: 16px;
+.courseOption {
+  width: 100%;
+  padding: 14px 16px;
   background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
   font-size: 15px;
-  color: #1d1d1d;
-  cursor: pointer;
   font-weight: 500;
+  color: #374151;
+  cursor: pointer;
   text-align: left;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: none;
-  border-bottom: 1px solid #f6f7f9;
   font-family: inherit;
-  transition: background 0.1s;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.certListItem:active {
-  background: #f6f8ff;
+.courseOption:active {
+  background: #f0f5ff;
 }
 
-.certListItemSelected {
-  color: #0051ff;
+.courseOptionSelected {
+  border-color: #4c85ff;
+  background: #f0f5ff;
+  color: #4c85ff;
+  font-weight: 600;
 }
 
-.selectedCertContainer {
-  border-top: 1px solid #f2f4f6;
-  background-color: #fff;
-  flex-shrink: 0;
+.customCourseSection {
+  margin-top: 20px;
+  padding-bottom: 4px;
 }
 
-.selectedCertLabel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 15px;
-  font-weight: 700;
-  color: #191f28;
-  padding: 14px 16px 8px;
+.customCourseLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
 }
 
-.selectedCertCount {
-  color: #0051ff;
-  margin-left: 2px;
-}
-
-.selectedCertList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 0 16px 14px;
-  max-height: 100px;
-  overflow-y: auto;
-}
-
-.selectedCertTag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 10px;
-  background-color: #f2f2f2;
+.customCourseInput {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
   color: #1d1d1d;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
 }
 
-.removeTagButton {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: #9ca3af;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
+.customCourseInput:focus {
+  border-color: #4c85ff;
 }
 
-.noCertMessage {
-  font-size: 13px;
+.customCourseInput::placeholder {
   color: #9ca3af;
-  padding: 4px 0;
 }
 
 .certModalFooter {
-  padding: 16px;
-  border-top: 1px solid #f2f4f6;
-  display: flex;
-  gap: 10px;
+  padding: 12px 16px 16px;
   flex-shrink: 0;
 }
 
 .certModalConfirmButton {
-  flex: 1;
+  width: 100%;
   height: 50px;
   background-color: #4c85ff;
   color: #fff;
@@ -644,18 +567,8 @@
   transition: background 0.2s;
 }
 
-.certModalResetButton {
-  flex: 1;
-  height: 50px;
-  background-color: #fff;
-  color: #6b7280;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s;
+.certModalConfirmButton:active {
+  background-color: #3b6fe0;
 }
 
 .resetButtonContent {

@@ -85,131 +85,15 @@ function ClickSourceHandler({
   return null;
 }
 
-const CERT_CATEGORIES = [
-  {
-    label: "전체과정",
-    options: [
-      "병원동행매니저1급",
-      "노인돌봄생활지원사1급",
-      "방과후돌봄교실지도사1급",
-      "바리스타1급",
-      "타로심리상담사1급",
-      "심리상담사1급",
-      "아동요리지도사1급",
-      "노인심리상담사1급",
-      "다문화심리상담사1급",
-      "독서논술지도사1급",
-      "독서지도사1급",
-      "동화구연지도사1급",
-      "디지털중독예방지도사1급",
-      "미술심리상담사1급",
-      "미술심리상담사2급",
-      "방과후수학지도사1급",
-      "스토리텔링수학지도사1급",
-      "방과후아동지도사1급",
-      "방과후학교지도사1급",
-      "병원코디네이터1급",
-      "부동산권리분석사1급",
-      "부모교육상담사1급",
-      "북아트1급",
-      "산모신생아건강관리사",
-      "산후관리사",
-      "손유희지도사1급",
-      "스피치지도사1급",
-      "실버인지활동지도사1급",
-      "심리분석사1급",
-      "아동공예지도자",
-      "아동미술심리상담사",
-      "아동미술지도사",
-      "아동미술심리상담사1급",
-      "안전교육지도사",
-      "안전관리사",
-      "안전교육지도사1급",
-      "영어동화구연지도사",
-      "유튜브크리에이터",
-      "음악심리상담사",
-      "이미지메이킹스피치",
-      "인성지도사1급",
-      "인성지도사2급",
-      "자기주도학습지도사1급",
-      "자기주도학습지도사2급",
-      "자원봉사지도사1급",
-      "종이접기지도사",
-      "지역아동교육지도사1급",
-      "진로적성상담사1급",
-      "코딩지도사",
-      "클레이아트지도사",
-      "프레젠테이션스피치",
-      "학교폭력예방상담사1급",
-      "NIE지도사1급",
-      "교육마술지도사1급",
-      "POP디자인지도사",
-      "SNS마케팅전문가",
-    ],
-  },
-  {
-    label: "실버과정",
-    options: [
-      "생활지원사1급",
-      "노인심리상담사1급",
-      "병원동행매니저1급",
-      "실버인지활동지도사1급",
-      "안전교육지도사1급",
-      "자원봉사지도사1급",
-    ],
-  },
-  {
-    label: "아동과정",
-    options: [
-      "아동미술지도사1급",
-      "아동요리지도사1급",
-      "손유희지도사1급",
-      "종이접기지도사1급",
-      "클레이아트지도사1급",
-      "북아트1급",
-    ],
-  },
-  {
-    label: "방과후과정",
-    options: [
-      "방과후돌봄교실지도사1급",
-      "방과후아동지도사1급",
-      "영어동화구연지도사1급",
-      "코딩지도사1급",
-      "독서논술지도사1급",
-      "진로적성상담사1급",
-      "학교폭력예방상담사1급",
-    ],
-  },
-  {
-    label: "심리과정",
-    options: [
-      "심리상담사1급",
-      "심리분석사1급",
-      "미술심리상담사1급",
-      "음악심리상담사1급",
-      "부모교육상담사1급",
-      "진로적성상담사1급",
-      "학교폭력예방상담사1급",
-    ],
-  },
-  {
-    label: "커피과정",
-    options: ["바리스타1급"],
-  },
-  {
-    label: "취·창업과정",
-    options: [
-      "타로심리상담사1급",
-      "바리스타1급",
-      "안전관리사1급",
-      "안전교육지도사1급",
-      "산모신생아건강관리사1급",
-      "산후관리사1급",
-      "SNS마케팅전문가1급",
-      "유튜브크리에이터1급",
-    ],
-  },
+const COURSE_OPTIONS = [
+  "사회복지사",
+  "아동학사",
+  "평생교육사",
+  "편입/대학원",
+  "건강가정사",
+  "청소년지도사",
+  "보육교사",
+  "심리상담사",
 ];
 
 function StepFlowContent({ clickSource }: { clickSource: string }) {
@@ -227,17 +111,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showCertModal, setShowCertModal] = useState(false);
-  const [selectedCategoryIdx, setSelectedCategoryIdx] = useState(0);
-  const [showModalArrow, setShowModalArrow] = useState(true);
-  const certListRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (showCertModal) setShowModalArrow(true);
-  }, [showCertModal, selectedCategoryIdx]);
-
-  const handleCertListScroll = () => {
-    if ((certListRef.current?.scrollTop ?? 0) > 10) setShowModalArrow(false);
-  };
+  const [customCourse, setCustomCourse] = useState("");
 
   const selectedCerts = formData.hope_course
     ? formData.hope_course.split(", ").filter(Boolean)
@@ -250,20 +124,28 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     setFormData({ ...formData, hope_course: updated.join(", ") });
   };
 
-  const toggleCategoryAll = (idx: number) => {
-    const catOptions = CERT_CATEGORIES[idx].options;
-    const allSelected = catOptions.every((o) => selectedCerts.includes(o));
+  const toggleAll = () => {
+    const allSelected = COURSE_OPTIONS.every((o) => selectedCerts.includes(o));
     if (allSelected) {
-      const updated = selectedCerts.filter((c) => !catOptions.includes(c));
-      setFormData({ ...formData, hope_course: updated.join(", ") });
+      setFormData({ ...formData, hope_course: "" });
     } else {
-      const toAdd = catOptions.filter((o) => !selectedCerts.includes(o));
-      setFormData({ ...formData, hope_course: [...selectedCerts, ...toAdd].join(", ") });
+      setFormData({ ...formData, hope_course: COURSE_OPTIONS.join(", ") });
+    }
+  };
+
+  const handleCustomCourseChange = (value: string) => {
+    setCustomCourse(value);
+    const updated = selectedCerts.filter((c) => !c.startsWith("직접입력:"));
+    if (value.trim()) {
+      setFormData({ ...formData, hope_course: [...updated, `직접입력:${value.trim()}`].join(", ") });
+    } else {
+      setFormData({ ...formData, hope_course: updated.join(", ") });
     }
   };
 
   const deselectAll = () => {
     setFormData({ ...formData, hope_course: "" });
+    setCustomCourse("");
   };
 
   // 연락처 포맷팅 (010-XXXX-XXXX)
@@ -307,10 +189,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
           contact: formData.contact,
           education: formData.education,
           hope_course: formData.hope_course,
-          major_category: CERT_CATEGORIES
-            .filter(cat => cat.options.some(opt => selectedCerts.includes(opt)))
-            .map(cat => cat.label)
-            .join(", "),
           reason: formData.reason,
           mamcafe_activity: formData.mamcafe_activity,
           click_source: formData.mamcafe_activity
@@ -380,7 +258,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                       color: "#111827",
                     }}
                   >
-                    취업자격증 상담신청
+                    무료 상담신청
                   </p>
                 </div>
                 <div className={styles.infoItem}>
@@ -394,18 +272,19 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 </div>
                 <div className={styles.infoItem}>
                   <div className={styles.infoTitle}>
-                    <div className={styles.infoNumber}>2</div> 응시료 면제
+                    <div className={styles.infoNumber}>2</div> 온라인 수업
                   </div>
                   <div className={styles.infoDesc}>
-                    온라인 시험, 재시험 가능
+                    모든 수업은 100% 온라인으로 진행
                   </div>
                 </div>
                 <div className={styles.infoItem}>
                   <div className={styles.infoTitle}>
-                    <div className={styles.infoNumber}>3</div> 온라인 수업
+                    <div className={styles.infoNumber}>3</div> 수업료 지원 혜택
                   </div>
                   <div className={styles.infoDesc}>
-                   모든 수업은 100% 온라인으로 진행
+                   상담 완료 후 수강료 지원 혜택
+
                   </div>
                 </div>
                 <div className={styles.infoSection}>
@@ -610,131 +489,57 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
         )}
       </AnimatePresence>
 
-      {/* 자격증 선택 모달 */}
+      {/* 희망과정 선택 모달 */}
       {showCertModal && (
         <div className={styles.modalOverlay} onClick={() => setShowCertModal(false)}>
           <div className={styles.certModalContainer} onClick={(e) => e.stopPropagation()}>
             <div className={styles.certModalHeader}>
-              <h3 className={styles.certModalTitle}>과정 선택</h3>
-              <button className={styles.certModalCloseButton} onClick={() => setShowCertModal(false)}>✕</button>
+              <h3 className={styles.certModalTitle}>희망과정 선택</h3>
+              <button className={styles.certModalCloseButton} onClick={() => setShowCertModal(false)}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="#6b7280" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
             </div>
 
-            <div className={styles.certModalBody}>
-              {/* 좌측: 카테고리 */}
-              <div className={styles.certCategoryList}>
-                {CERT_CATEGORIES.map((cat, idx) => (
-                  <button
-                    key={idx}
-                    className={`${styles.certCategoryItem} ${idx === selectedCategoryIdx ? styles.certCategoryItemActive : styles.certCategoryItemInactive}`}
-                    onClick={() => setSelectedCategoryIdx(idx)}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
+            <div className={styles.certModalScrollBody}>
+              <p className={styles.certModalSubtitle}>복수 선택이 가능합니다</p>
 
-              {/* 우측: 자격증 목록 */}
-              <div className={styles.certSelectAreaWrapper}>
-                <div
-                  className={styles.certListWrapper}
-                  ref={certListRef}
-                  onScroll={handleCertListScroll}
-                  style={{ position: "relative" }}
-                >
-                  <div className={styles.certCategorySection}>
-                    <div className={styles.certListContainer}>
-                      <button
-                        onClick={() => toggleCategoryAll(selectedCategoryIdx)}
-                        className={`${styles.certListItem} ${CERT_CATEGORIES[selectedCategoryIdx].options.every((o) => selectedCerts.includes(o)) ? styles.certListItemSelected : ""}`}
-                      >
-                        <span>전체</span>
-                        {CERT_CATEGORIES[selectedCategoryIdx].options.every((o) => selectedCerts.includes(o)) && <span>✓</span>}
-                      </button>
-                      {CERT_CATEGORIES[selectedCategoryIdx].options.map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => toggleCert(opt)}
-                          className={`${styles.certListItem} ${selectedCerts.includes(opt) ? styles.certListItemSelected : ""}`}
-                        >
-                          <span>{opt}</span>
-                          {selectedCerts.includes(opt) && <span>✓</span>}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <AnimatePresence>
-                  {showModalArrow && (
-                    <motion.div
-                      key="modal-arrow"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      style={{
-                        position: "sticky",
-                        bottom: 0,
-                        display: "flex",
-                        justifyContent: "center",
-                        pointerEvents: "none",
-                        paddingBottom: "4px",
-                        paddingRight : "30px"
-                      }}
+              <div className={styles.courseOptionList}>
+                {COURSE_OPTIONS.map((opt) => {
+                  const isSelected = selectedCerts.includes(opt);
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() => toggleCert(opt)}
+                      className={`${styles.courseOption} ${isSelected ? styles.courseOptionSelected : ""}`}
                     >
-                      <motion.div
-                        animate={{ y: [0, 6, 0] }}
-                        transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
-                      >
-                        <svg
-                          width="28"
-                          height="28"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#9ca3af"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="6 9 12 15 18 9" />
+                      <span>{opt}</span>
+                      {isSelected && (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                          <path d="M5 13L9 17L19 7" stroke="#4c85ff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                      </motion.div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            </div>
 
-            {/* 선택된 과정 태그 */}
-            <div className={styles.selectedCertContainer}>
-              <div className={styles.selectedCertLabel}>
-                <span>선택한 과정 <span className={styles.selectedCertCount}>{selectedCerts.length}</span></span>
-              </div>
-              <div className={styles.selectedCertList}>
-                {selectedCerts.map((cert) => (
-                  <div key={cert} className={styles.selectedCertTag}>
-                    <span>{cert}</span>
-                    <button className={styles.removeTagButton} onClick={() => toggleCert(cert)}>✕</button>
-                  </div>
-                ))}
-                {selectedCerts.length === 0 && (
-                  <div className={styles.noCertMessage}>선택한 과정이 없습니다</div>
-                )}
+              <div className={styles.customCourseSection}>
+                <label className={styles.customCourseLabel}>직접 입력</label>
+                <input
+                  type="text"
+                  className={styles.customCourseInput}
+                  placeholder="원하는 과정을 직접 입력해주세요"
+                  value={customCourse}
+                  onChange={(e) => handleCustomCourseChange(e.target.value)}
+                />
               </div>
             </div>
 
             <div className={styles.certModalFooter}>
-              <button className={styles.certModalResetButton} onClick={deselectAll}>
-                <div className={styles.resetButtonContent}>
-                  <span>초기화</span>
-                  <div className={styles.resetIcon}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M8 2.03321C6.33627 2.03326 4.9234 2.61176 3.76758 3.76758C2.61175 4.92341 2.03326 6.33627 2.0332 8C2.03324 9.66366 2.61189 11.0766 3.76758 12.2324C4.92338 13.3881 6.33634 13.9667 8 13.9668C9.15476 13.9668 10.206 13.6683 11.1514 13.0713C12.0942 12.4758 12.8209 11.6814 13.3301 10.6895C13.4449 10.4884 13.4505 10.2715 13.3535 10.0498C13.2569 9.82916 13.0935 9.6795 12.8691 9.60938C12.6659 9.54261 12.463 9.5463 12.2646 9.6211C12.0646 9.69663 11.9086 9.83209 11.7998 10.0225L11.7988 10.0244C11.4289 10.718 10.9062 11.2704 10.2305 11.6826C9.55588 12.0941 8.81313 12.2998 8 12.2998C6.8041 12.2998 5.79066 11.8824 4.9541 11.0459C4.11766 10.2093 3.69926 9.1959 3.69922 8C3.69928 6.80403 4.11752 5.79069 4.9541 4.9541C5.79069 4.11752 6.80403 3.69928 8 3.69922C8.77737 3.69925 9.49674 3.89055 10.1592 4.27246C10.7709 4.62529 11.261 5.10193 11.6338 5.69922H9.4668C9.23471 5.69928 9.03476 5.78025 8.87402 5.94043C8.71317 6.10077 8.63235 6.30061 8.63281 6.53321C8.63336 6.76551 8.71437 6.96565 8.87402 7.12598C9.03393 7.2863 9.23401 7.36616 9.4668 7.36621H13.1338C13.3662 7.36664 13.5662 7.28728 13.7266 7.12696C13.887 6.96653 13.9668 6.76618 13.9668 6.53321V2.86621C13.9677 2.6342 13.8881 2.43412 13.7275 2.27344C13.5667 2.11272 13.3655 2.03266 13.1328 2.03321C12.9007 2.03391 12.7012 2.1138 12.541 2.27344C12.3805 2.43339 12.2999 2.63329 12.2998 2.86621V3.88672C11.7771 3.32321 11.1639 2.88126 10.4609 2.56348C9.67821 2.20974 8.85733 2.03323 8 2.03321Z" fill="#656565"/>
-                    </svg>
-                  </div>
-                </div>
-              </button>
               <button className={styles.certModalConfirmButton} onClick={() => setShowCertModal(false)}>
-                선택하기
+                선택 완료
               </button>
             </div>
           </div>
