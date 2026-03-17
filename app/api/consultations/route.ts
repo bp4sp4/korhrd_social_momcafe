@@ -42,7 +42,7 @@ export async function GET() {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('hakjeom_consultations')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     // Supabase에 데이터 저장
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('hakjeom_consultations')
       .insert([
         {
           name,
@@ -398,7 +398,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('hakjeom_consultations')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -450,7 +450,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('hakjeom_consultations')
       .delete()
       .in('id', ids)
       .select();
