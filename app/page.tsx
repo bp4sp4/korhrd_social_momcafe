@@ -219,6 +219,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     formData.name.length > 0 &&
     formData.contact.replace(/[-\s]/g, "").length >= 10 &&
     !contactError &&
+    formData.education.length > 0 &&
     formData.hope_course.length > 0 &&
     formData.reason.length > 0 &&
     formData.mamcafe_activity.length > 0 &&
@@ -357,6 +358,26 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               {contactError && (
                 <p className={styles.errorMessage}>{contactError}</p>
               )}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                최종학력 <span style={{ color: "#EF4444" }}>*</span>
+                <span style={{ fontSize: "13px", color: "#9ca3af", fontWeight: 400 }}> 최종학력마다 과정이 달라져요!</span>
+              </label>
+              <select
+                className={styles.selectField}
+                value={formData.education}
+                onChange={(e) =>
+                  setFormData({ ...formData, education: e.target.value })
+                }
+              >
+                <option value="">선택해주세요</option>
+                <option value="고졸">고졸</option>
+                <option value="전문대졸">전문대졸</option>
+                <option value="대졸">대졸</option>
+                <option value="대학원 이상">대학원 이상</option>
+              </select>
             </div>
 
             <div className={styles.inputGroup}>
