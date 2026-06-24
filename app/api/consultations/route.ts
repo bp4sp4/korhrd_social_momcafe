@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence } = body;
+    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, counsel_check, memo, fast_consultation, preferred_times, consult_time_memo } = body;
 
     // 유효성 검사
     if (!name || !contact || !reason) {
@@ -102,6 +102,11 @@ export async function POST(request: NextRequest) {
           reason: reason || null,
           click_source: click_source || null,
           residence: residence || null,
+          counsel_check: counsel_check || null,
+          memo: memo || null,
+          fast_consultation: !!fast_consultation,
+          preferred_times: Array.isArray(preferred_times) && preferred_times.length ? preferred_times : null,
+          consult_time_memo: consult_time_memo || null,
           status: '상담대기', // 기본 상태
         },
       ])
