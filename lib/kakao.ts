@@ -2,6 +2,52 @@ interface AlimtalkData {
   contact: string;
 }
 
+export function parsePhones(raw: string | undefined): string[] {
+  if (!raw) return []
+  return raw.split(',').map((s) => s.trim()).filter(Boolean)
+}
+
+export async function sendAdminNewInquiryAlimtalk(customerName: string): Promise<void> {
+  const phones = parsePhones(process.env.ALIGO_NEW_INQUIRY_PHONES)
+  console.log('[ADMIN] ALIGO_NEW_INQUIRY_PHONES:', process.env.ALIGO_NEW_INQUIRY_PHONES, '→ phones:', phones)
+  if (phones.length === 0) return
+
+  const apikey = process.env.ALIGO_API_KEY
+  const userid = process.env.ALIGO_USER_ID
+  const senderkey = process.env.ALIGO_SENDER_KEY
+  const sender = process.env.ALIGO_SENDER
+  if (!apikey || !userid || !senderkey || !sender) return
+
+  const tpl_code = 'UH_4559'
+  const message = `${customerName}님, 새로운 문의가 등록되었습니다.`
+  const proxyUrl = process.env.PROXY_URL
+  const proxySecret = process.env.PROXY_SECRET
+
+  const payload: Record<string, string> = { apikey, userid, senderkey, tpl_code, sender, failover: 'N' }
+  phones.forEach((phone, i) => {
+    payload[`receiver_${i + 1}`] = phone.replace(/-/g, '')
+    payload[`subject_${i + 1}`] = '새 문의 알림'
+    payload[`message_${i + 1}`] = message
+  })
+
+  try {
+    if (proxyUrl && proxySecret) {
+      await fetch(`${proxyUrl.replace(/\/$/, '')}/alimtalk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-proxy-secret': proxySecret },
+        body: JSON.stringify(payload),
+      })
+    } else {
+      const formData = new FormData()
+      Object.entries(payload).forEach(([k, v]) => formData.append(k, v))
+      await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', { method: 'POST', body: formData })
+    }
+    console.log('[KAKAO] ✅ 관리자 신규 문의 알림톡 전송')
+  } catch (e) {
+    console.error('[KAKAO] 관리자 알림톡 전송 실패:', e)
+  }
+}
+
 export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boolean; error?: string }> {
   const apikey = process.env.ALIGO_API_KEY;
   const userid = process.env.ALIGO_USER_ID;
@@ -22,6 +68,10 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
 
   const receiverPhone = data.contact.replace(/-/g, '');
   const message = templateMessage;
+  // 템플릿에 등록된 버튼과 똑같이 보내야 한다. 빠지면 "메시지가 템플릿과 일치하지 않음"으로 실패.
+  // 기본값은 채널추가(AC) 버튼. 템플릿 버튼이 바뀌면 ALIGO_TEMPLATE_BUTTON 에 JSON 으로 넣는다.
+  const button = process.env.ALIGO_TEMPLATE_BUTTON ||
+    JSON.stringify({ button: [{ name: '채널추가', linkType: 'AC', linkTypeName: '채널 추가' }] });
 
   const proxyUrl = process.env.PROXY_URL;
   const proxySecret = process.env.PROXY_SECRET;
@@ -33,7 +83,7 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
 
     if (proxyUrl && proxySecret) {
       // 카페24 프록시를 통해 전송 (고정 IP)
-      const response = await fetch(`${proxyUrl}/alimtalk`, {
+      const response = await fetch(`${proxyUrl.replace(/\/$/, '')}/alimtalk`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,10 +98,17 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
           receiver_1: receiverPhone,
           subject_1: process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내',
           message_1: message,
+          button_1: button,
           failover: 'N',
         }),
       });
-      result = await response.json() as { code: number; message: string; info?: unknown };
+      const text = await response.text();
+      try {
+        result = JSON.parse(text) as { code: number; message: string; info?: unknown };
+      } catch {
+        console.error('[KAKAO] ❌ 프록시 비-JSON 응답:', response.status, text.slice(0, 200));
+        return { success: false, error: `프록시 응답 오류 (${response.status}): ${text.slice(0, 100)}` };
+      }
     } else {
       // 프록시 미설정시 직접 호출
       const formData = new FormData();
@@ -63,6 +120,7 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
       formData.append('receiver_1', receiverPhone);
       formData.append('subject_1', process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내');
       formData.append('message_1', message);
+      formData.append('button_1', button);
       formData.append('failover', 'N');
       const response = await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', {
         method: 'POST',
