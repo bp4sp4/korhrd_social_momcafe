@@ -114,6 +114,9 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [contactError, setContactError] = useState("");
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  // [선택] 광고성 정보 수신 동의 — 기본 꺼짐, 안 해도 신청 가능 (정보통신망법 제50조, 2026-11-13)
+  const [marketingAgreed, setMarketingAgreed] = useState(false);
+  const [showMarketingModal, setShowMarketingModal] = useState(false);
   const [showCertModal, setShowCertModal] = useState(false);
   const [customCourse, setCustomCourse] = useState("");
   const [quickConsult, setQuickConsult] = useState(false); // (선택) 빠른 상담
@@ -213,6 +216,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
           fast_consultation: quickConsult,
           preferred_times: preferredTimes,
           consult_time_memo: timeMemo || null,
+          marketingAgreed,
         }),
       });
 
@@ -658,6 +662,44 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   )}
                 </button>
               </div>
+              <div className={styles.privacyRow}>
+                <span className={styles.privacyText}>
+                  <button
+                    type="button"
+                    onClick={() => setShowMarketingModal(true)}
+                    className={styles.privacyLink}
+                  >
+                    광고성 정보 수신
+                  </button>{" "}
+                  <span className={styles.privacyAgree}>동의</span>{" "}
+                  <span className={styles.privacyAgree}>(선택)</span>
+                </span>
+                <button
+                  type="button"
+                  className={`${styles.quickConsultCheck} ${marketingAgreed ? styles.quickConsultCheckOn : ""}`}
+                  onClick={() => setMarketingAgreed((prev) => !prev)}
+                  aria-pressed={marketingAgreed}
+                  aria-label="광고성 정보 수신 동의 (선택)"
+                >
+                  {marketingAgreed && (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                        stroke="#fff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button
@@ -778,6 +820,56 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
         </div>
       )}
 
+      {/* [선택] 광고성 정보 수신 동의 모달 (2026-11-13) */}
+      {showMarketingModal && (
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowMarketingModal(false)}
+        >
+          <div
+            className={styles.modalPrivacy}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalPrivacyHeader}>
+              <h3 className={styles.modalPrivacyTitle}>[선택] 광고성 정보 수신 동의</h3>
+              <button
+                className={styles.modalCloseButton}
+                onClick={() => setShowMarketingModal(false)}
+                aria-label="닫기"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+            <div className={styles.modalPrivacyContent}>
+              <div className={styles.modalPrivacyScroll}>
+                <p className={styles.modalPrivacyItem}>
+                  <strong>1. 목적</strong>
+                  <br />
+                  교육 과정 · 자격증 · 할인 · 이벤트 등 혜택 안내
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  <strong>2. 방법</strong>
+                  <br />
+                  문자(SMS · LMS · MMS), 카카오톡, 전화
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  <strong>3. 보유 · 이용 기간</strong>
+                  <br />
+                  동의 철회 시 또는 수집일로부터 5년
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  <strong>4. 동의 거부 권리</strong>
+                  <br />
+                  동의하지 않아도 상담 신청은 할 수 있으며, 동의 후에도 언제든 무료수신거부로 철회할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 개인정보처리방침 모달 */}
       {showPrivacyModal && (
         <div
@@ -828,11 +920,13 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   필수 - 이름, 연락처(휴대전화번호), 희망과정, 취득사유, 맘카페
                   이름
                   <br />
+                  선택 - 광고성 정보 수신 동의 여부
+                  <br />
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>
                   <br />
-                  법령이 정하는 경우를 제외하고는 수집일로부터 1년 또는 동의
+                  법령이 정하는 경우를 제외하고는 수집일로부터 5년 또는 동의
                   철회 시까지 보유 및 이용합니다.
                 </p>
                 <p className={styles.modalPrivacyItem}>

@@ -80,7 +80,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, counsel_check, memo, fast_consultation, preferred_times, consult_time_memo } = body;
+    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, counsel_check, memo, fast_consultation, preferred_times, consult_time_memo, marketingAgreed } = body;
+    // [선택] 광고성 정보 수신 동의 — 참일 때만 동의 시각을 남긴다 (정보통신망법 제50조 사전 동의 근거, 2026-11-13)
+    const marketingAgreedBool = marketingAgreed === true;
 
     // 유효성 검사
     if (!name || !contact || !reason) {
@@ -107,6 +109,8 @@ export async function POST(request: NextRequest) {
           fast_consultation: !!fast_consultation,
           preferred_times: Array.isArray(preferred_times) && preferred_times.length ? preferred_times : null,
           consult_time_memo: consult_time_memo || null,
+          marketing_agreed: marketingAgreedBool,
+          marketing_agreed_at: marketingAgreedBool ? new Date().toISOString() : null,
           status: '상담대기', // 기본 상태
         },
       ])
