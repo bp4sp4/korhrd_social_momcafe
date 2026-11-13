@@ -117,6 +117,13 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   // [선택] 광고성 정보 수신 동의 — 기본 꺼짐, 안 해도 신청 가능 (정보통신망법 제50조, 2026-11-13)
   const [marketingAgreed, setMarketingAgreed] = useState(false);
   const [showMarketingModal, setShowMarketingModal] = useState(false);
+  // 「모두 동의」 — 필수(개인정보) + 선택(광고성 정보 수신)을 한 번에 켜고 끔. 제출 조건(isFormValid)은 필수만 봄
+  const allConsentsAgreed = privacyAgreed && marketingAgreed;
+  const toggleAllConsents = () => {
+    const next = !allConsentsAgreed;
+    setPrivacyAgreed(next);
+    setMarketingAgreed(next);
+  };
   const [showCertModal, setShowCertModal] = useState(false);
   const [customCourse, setCustomCourse] = useState("");
   const [quickConsult, setQuickConsult] = useState(false); // (선택) 빠른 상담
@@ -624,6 +631,37 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             </div>
 
             <div className={styles.inputGroup}>
+              <div className={styles.privacyRow}>
+                <span className={styles.privacyText}>
+                  <span className={styles.privacyAgree}>모두 동의합니다</span>{" "}
+                  <span className={styles.privacyAgree}>(선택 항목 포함)</span>
+                </span>
+                <button
+                  type="button"
+                  className={`${styles.quickConsultCheck} ${allConsentsAgreed ? styles.quickConsultCheckOn : ""}`}
+                  onClick={toggleAllConsents}
+                  aria-pressed={allConsentsAgreed}
+                  aria-label="모두 동의합니다 (선택 항목 포함)"
+                >
+                  {allConsentsAgreed && (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                        stroke="#fff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
               <div className={styles.privacyRow}>
                 <span className={styles.privacyText}>
                   <button
