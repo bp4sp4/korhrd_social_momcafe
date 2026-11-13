@@ -168,3 +168,63 @@
     font-size: 0.7rem;
   }
 }
+
+/* Keep the shared footer aligned with the reference consultation form. */
+.footer {
+  width: 100%;
+  max-width: 640px;
+  min-height: 285px;
+  margin: 0 auto;
+  padding: 82px 30px 38px;
+  border: 0;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  background: #f7f8fa;
+  color: #5f6b7b;
+  font-family: Pretendard, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.footerContent {
+  width: 100%;
+  padding: 0;
+  gap: 0;
+}
+
+.logoText img {
+  width: 218px;
+  height: auto;
+  margin-bottom: 5px;
+}
+
+.infoLine,
+.footerLink,
+.divider {
+  color: #5f6b7b;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.footerLinks {
+  gap: 11px;
+  margin: 7px 0 0;
+}
+
+.footerLink {
+  color: #3e4c5e;
+}
+
+.copyright {
+  margin: 13px 0 0;
+  color: #5f6b7b;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+@media (max-width: 480px) {
+  .footer {
+    border: 0;
+    padding: 66px 28px 32px;
+  }
+}

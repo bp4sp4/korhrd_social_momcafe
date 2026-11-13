@@ -9,7 +9,8 @@ export default function Footer() {
       <div className={styles.footerContent}>
         <div className={styles.footerLogo}>
           <span className={styles.logoText}>
-            <img src="/logo.png" alt="BaroCompany Logo" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/hanpyeong-education-footer-logo.png" alt="한평생원격교육원" />
           </span>
         </div>
 
@@ -27,7 +28,7 @@ export default function Footer() {
             </Link>
           </div>
           <p className={styles.copyright}>
-            2026 © KorhrdGroup CO., All rights reserved.
+            2026 © KorhrdGroupCo., Ltd. All rights reserved.
           </p>
         </div>
       </div>

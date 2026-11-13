@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "./stepflow.module.css";
@@ -86,19 +86,7 @@ function ClickSourceHandler({
   return null;
 }
 
-const COURSE_OPTIONS = [
-  "사회복지사",
-  "보육교사",
-  "평생교육사",
-  "정사서",
-  "종합미용면허증",
-  "아동학사/장애영유아",
-  "편입/대학원",
-  "청소년지도사",
-  "심리상담사",
-];
-
-const TIME_OPTIONS = ["10:00~13:00", "14:00~17:00", "17:00~19:00"];
+const TIME_OPTIONS = ["9:00~12:30", "13:30~15:00", "15:00~18:00"];
 
 function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [step, setStep] = useState(2);
@@ -124,8 +112,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     setPrivacyAgreed(next);
     setMarketingAgreed(next);
   };
-  const [showCertModal, setShowCertModal] = useState(false);
-  const [customCourse, setCustomCourse] = useState("");
   const [quickConsult, setQuickConsult] = useState(false); // (선택) 빠른 상담
   const [preferredTimes, setPreferredTimes] = useState<string[]>([]); // 상담 선호 시간
   const [timeMemo, setTimeMemo] = useState(""); // 상담 시간 관련 메모
@@ -134,44 +120,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     setPreferredTimes((prev) =>
       prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time],
     );
-  };
-
-  const selectedCerts = formData.hope_course
-    ? formData.hope_course.split(", ").filter(Boolean)
-    : [];
-
-  const toggleCert = (cert: string) => {
-    const updated = selectedCerts.includes(cert)
-      ? selectedCerts.filter((c) => c !== cert)
-      : [...selectedCerts, cert];
-    setFormData({ ...formData, hope_course: updated.join(", ") });
-  };
-
-  const toggleAll = () => {
-    const allSelected = COURSE_OPTIONS.every((o) => selectedCerts.includes(o));
-    if (allSelected) {
-      setFormData({ ...formData, hope_course: "" });
-    } else {
-      setFormData({ ...formData, hope_course: COURSE_OPTIONS.join(", ") });
-    }
-  };
-
-  const handleCustomCourseChange = (value: string) => {
-    setCustomCourse(value);
-    const updated = selectedCerts.filter((c) => !c.startsWith("직접입력:"));
-    if (value.trim()) {
-      setFormData({
-        ...formData,
-        hope_course: [...updated, `직접입력:${value.trim()}`].join(", "),
-      });
-    } else {
-      setFormData({ ...formData, hope_course: updated.join(", ") });
-    }
-  };
-
-  const deselectAll = () => {
-    setFormData({ ...formData, hope_course: "" });
-    setCustomCourse("");
   };
 
   // 연락처 포맷팅 (010-XXXX-XXXX)
@@ -261,9 +209,9 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
         <div style={{ display: "flex", alignItems: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
-            alt="한평생교육"
-            style={{ height: "34px", width: "auto" }}
+            src="/hanpyeong-education-logo.png"
+            alt="한평생원격교육원"
+            className={styles.logo}
           />
         </div>
       </header>
@@ -338,135 +286,70 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={`${styles.stepWrapper} ${styles.formBody}`}
           >
-            <div style={{ textAlign: "left" }}>
-              <p
-                style={{
-                  fontSize: "28px",
-                  fontWeight: "700",
-                  color: "#111827",
-                }}
-              >
-                무료 학습 상담 신청
-              </p>
-            </div>
+            <h1 className={styles.formHeading}>무료 학습 상담 신청</h1>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
-                이름을 입력해주세요 <span style={{ color: "#EF4444" }}>*</span>
+              <label className={styles.inputLabel} htmlFor="form-name">
+                이름 <span className={styles.required}>*</span>
               </label>
               <input
+                id="form-name"
                 type="text"
                 placeholder="이름을 입력해주세요"
                 className={styles.inputField}
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 autoFocus
               />
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
-                연락처를 입력해주세요{" "}
-                <span style={{ color: "#EF4444" }}>*</span>
+              <label className={styles.inputLabel} htmlFor="form-contact">
+                연락처 <span className={styles.required}>*</span>
               </label>
               <input
+                id="form-contact"
                 type="tel"
                 placeholder="010-0000-0000"
                 className={styles.inputField}
                 value={formData.contact}
                 onChange={(e) => {
-                  const value = e.target.value;
-                  const formatted = formatContact(value);
+                  const formatted = formatContact(e.target.value);
                   setFormData({ ...formData, contact: formatted });
                   validateContact(formatted);
                 }}
               />
-              {contactError && (
-                <p className={styles.errorMessage}>{contactError}</p>
-              )}
+              {contactError && <p className={styles.errorMessage}>{contactError}</p>}
             </div>
 
             <div className={styles.inputGroup}>
               <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
                 <span className={styles.inputLabelMain}>
-                  최종학력 <span style={{ color: "#EF4444" }}>*</span>
+                  최종학력 <span className={styles.required}>*</span>
                 </span>
-                <span className={styles.inputLabelSub}>
-                  최종학력마다 과정이 달라져요!
-                </span>
+                <span className={styles.inputLabelSub}>최종학력마다 과정이 달라져요!</span>
               </label>
-              <div className={styles.selectBox}>
-                <select
-                  className={styles.selectBoxSelect}
-                  value={formData.education}
-                  onChange={(e) =>
-                    setFormData({ ...formData, education: e.target.value })
-                  }
-                >
-                  <option value="">선택해주세요</option>
-                  <option value="고졸">고졸</option>
-                  <option value="전문대졸">전문대졸</option>
-                  <option value="대졸">대졸</option>
-                  <option value="대학원 이상">대학원 이상</option>
-                </select>
-                <span className={styles.selectBoxChevron}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                  >
-                    <path
-                      d="M10.7683 3.3485C10.6276 3.20789 10.4369 3.12891 10.238 3.12891C10.0391 3.12891 9.8484 3.20789 9.70775 3.3485L5.99525 7.061L2.28275 3.3485C2.1413 3.21188 1.95185 3.13628 1.7552 3.13799C1.55855 3.1397 1.37044 3.21858 1.23139 3.35763C1.09233 3.49669 1.01346 3.6848 1.01175 3.88144C1.01004 4.07809 1.08563 4.26754 1.22225 4.409L5.465 8.65175C5.60565 8.79235 5.79638 8.87134 5.99525 8.87134C6.19413 8.87134 6.38486 8.79235 6.5255 8.65175L10.7683 4.409C10.9089 4.26835 10.9878 4.07762 10.9878 3.87875C10.9878 3.67987 10.9089 3.48914 10.7683 3.3485Z"
-                      fill="#919191"
-                    />
-                  </svg>
-                </span>
+              <div className={`${styles.choiceGrid} ${styles.educationChoices}`} role="radiogroup" aria-label="최종학력">
+                {["고졸", "전문대졸", "대학교 중퇴", "4년제 대졸", "대학원생 이상"].map((option) => (
+                  <label key={option} className={`${styles.choiceBox} ${formData.education === option ? styles.choiceBoxSelected : ""}`}>
+                    <input type="radio" name="education" value={option} checked={formData.education === option} onChange={() => setFormData({ ...formData, education: option })} />
+                    {option}
+                  </label>
+                ))}
               </div>
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
-                <span className={styles.inputLabelMain}>
-                  희망과정을 선택해주세요{" "}
-                  <span style={{ color: "#EF4444" }}>*</span>
-                </span>
-                <span className={styles.inputLabelSub}>복수선택 가능</span>
+              <label className={styles.inputLabel}>
+                희망과정 <span className={styles.required}>*</span>
               </label>
-              <div
-                className={`${styles.selectBox} ${styles.selectBoxClickable}`}
-                onClick={() => setShowCertModal(true)}
-              >
-                {selectedCerts.length > 0 ? (
-                  <span className={styles.selectBoxValue}>
-                    {selectedCerts.length}개 선택됨:{" "}
-                    {selectedCerts.slice(0, 2).join(", ")}
-                    {selectedCerts.length > 2
-                      ? ` 외 ${selectedCerts.length - 2}개`
-                      : ""}
-                  </span>
-                ) : (
-                  <span className={styles.selectBoxPlaceholder}>
-                    과정을 선택해주세요
-                  </span>
-                )}
-                <span className={styles.selectBoxChevron}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                  >
-                    <path
-                      d="M10.7683 3.3485C10.6276 3.20789 10.4369 3.12891 10.238 3.12891C10.0391 3.12891 9.8484 3.20789 9.70775 3.3485L5.99525 7.061L2.28275 3.3485C2.1413 3.21188 1.95185 3.13628 1.7552 3.13799C1.55855 3.1397 1.37044 3.21858 1.23139 3.35763C1.09233 3.49669 1.01346 3.6848 1.01175 3.88144C1.01004 4.07809 1.08563 4.26754 1.22225 4.409L5.465 8.65175C5.60565 8.79235 5.79638 8.87134 5.99525 8.87134C6.19413 8.87134 6.38486 8.79235 6.5255 8.65175L10.7683 4.409C10.9089 4.26835 10.9878 4.07762 10.9878 3.87875C10.9878 3.67987 10.9089 3.48914 10.7683 3.3485Z"
-                      fill="#919191"
-                    />
-                  </svg>
-                </span>
+              <div className={`${styles.choiceGrid} ${styles.courseChoices}`} role="radiogroup" aria-label="희망과정">
+                {["사회복지사", "아동학사", "기타"].map((option) => (
+                  <label key={option} className={`${styles.choiceBox} ${formData.hope_course === option ? styles.choiceBoxSelected : ""}`}>
+                    <input type="radio" name="hope_course" value={option} checked={formData.hope_course === option} onChange={() => setFormData({ ...formData, hope_course: option })} />
+                    {option}
+                  </label>
+                ))}
               </div>
             </div>
 
@@ -474,7 +357,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
                 <span className={styles.inputLabelMain}>
                   취득사유가 어떻게 되시나요?{" "}
-                  <span style={{ color: "#EF4444" }}>*</span>
+                  <span className={styles.required}>*</span>
                 </span>
                 <span className={styles.inputLabelSub}>복수선택 가능</span>
               </label>
@@ -503,7 +386,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                             reason: updated.join(", "),
                           });
                         }}
-                        style={{ display: "none" }}
                       />
                       {opt}
                     </label>
@@ -516,7 +398,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
                 <span className={styles.inputLabelMain}>
                   활동하고 계신 맘카페를 적어주세요{" "}
-                  <span style={{ color: "#EF4444" }}>*</span>
+                  <span className={styles.required}>*</span>
                 </span>
                 <span className={styles.inputLabelSub}>제휴여부 확인</span>
               </label>
@@ -538,7 +420,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <div className={styles.quickConsultBlock}>
                   <div className={styles.quickConsultHeader}>
                     <span className={styles.quickConsultTitle}>
-                      (선택) 빠른 상담을 원합니다.
+                      빠른 상담을 원합니다.
                     </span>
                     <button
                       type="button"
@@ -567,24 +449,17 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                     </button>
                   </div>
                   <p className={styles.quickConsultDesc}>
-                    빠른 상담 체크 시{" "}
-                    <span className={styles.quickConsultEmph}>
-                      당일 오후 7시
-                    </span>{" "}
-                    이전까지 신청은 당일 상담,
-                    <br /> 이후 신청은 다음날 오전 10시~ 오후 7시 사이에
-                    연락드립니다.
+                    영업시간 9:00~18:00 사이 연락 드립니다.
                   </p>
                 </div>
 
                 {/* (선택) 상담이 편하신 시간을 알려주세요. */}
                 <div className={styles.preferTimeBlock}>
-                  <span className={styles.quickConsultTitle}>
-                    (선택) 상담이 편하신 시간을 알려주세요.
-                  </span>
-
                   {/* 상담 선호 시간 */}
                   <div className={styles.preferTimeGroup}>
+                    <span className={styles.quickConsultTitle}>
+                      상담이 편하신 시간대를 알려주세요.
+                    </span>
                     <div className={styles.preferLabelWrap}>
                       <span className={styles.preferLabel}>상담 선호 시간</span>
                       <span className={styles.preferSubLabel}>
@@ -610,27 +485,30 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   <div className={styles.preferMemoGroup}>
                     <div className={styles.preferLabelWrap}>
                       <span className={styles.preferLabel}>
-                        상담 시간 관련 메모(25자 이내)
+                        상담 시간 관련 메모
                       </span>
                       <span className={styles.preferMemoSubLabel}>
                         편하신 요일, 시간 관련 메모를 남겨주시면 최대한 맞춰서
                         연락드려요.
                       </span>
                     </div>
-                    <input
-                      type="text"
-                      maxLength={25}
-                      placeholder="월/수/금 오전, 화/목 오후 선호"
-                      className={styles.preferMemoInput}
-                      value={timeMemo}
-                      onChange={(e) => setTimeMemo(e.target.value)}
-                    />
+                    <div className={styles.memoInputWrap}>
+                      <input
+                        type="text"
+                        maxLength={25}
+                        placeholder="월/수/금 오전, 화/목 오후 선호"
+                        className={styles.preferMemoInput}
+                        value={timeMemo}
+                        onChange={(e) => setTimeMemo(e.target.value)}
+                      />
+                      <span className={styles.memoCounter}>{timeMemo.length}/25</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className={styles.inputGroup}>
+            <div className={`${styles.inputGroup} ${styles.consentGroup}`}>
               <div className={styles.privacyRow}>
                 <span className={styles.privacyText}>
                   <span className={styles.privacyAgree}>모두 동의합니다</span>{" "}
@@ -773,91 +651,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
         )}
       </AnimatePresence>
 
-      {/* 희망과정 선택 모달 */}
-      {showCertModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowCertModal(false)}
-        >
-          <div
-            className={styles.certModalContainer}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.certModalHeader}>
-              <h3 className={styles.certModalTitle}>희망과정 선택</h3>
-              <button
-                className={styles.certModalCloseButton}
-                onClick={() => setShowCertModal(false)}
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M18 6L6 18M6 6L18 18"
-                    stroke="#6b7280"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className={styles.certModalScrollBody}>
-              <p className={styles.certModalSubtitle}>복수 선택이 가능합니다</p>
-
-              <div className={styles.courseOptionList}>
-                {COURSE_OPTIONS.map((opt) => {
-                  const isSelected = selectedCerts.includes(opt);
-                  return (
-                    <button
-                      key={opt}
-                      onClick={() => toggleCert(opt)}
-                      className={`${styles.courseOption} ${isSelected ? styles.courseOptionSelected : ""}`}
-                    >
-                      <span>{opt}</span>
-                      {isSelected && (
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M5 13L9 17L19 7"
-                            stroke="#4c85ff"
-                            strokeWidth="2.2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className={styles.customCourseSection}>
-                <label className={styles.customCourseLabel}>직접 입력</label>
-                <input
-                  type="text"
-                  className={styles.customCourseInput}
-                  placeholder="원하는 과정을 직접 입력해주세요"
-                  value={customCourse}
-                  onChange={(e) => handleCustomCourseChange(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className={styles.certModalFooter}>
-              <button
-                className={styles.certModalConfirmButton}
-                onClick={() => setShowCertModal(false)}
-              >
-                선택 완료
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* [선택] 광고성 정보 수신 동의 모달 (2026-11-13) */}
       {showMarketingModal && (
         <div
@@ -963,10 +756,11 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
-                  필수 - 이름, 연락처(휴대전화번호), 희망과정, 취득사유, 맘카페
-                  이름
+                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정,
+                  취득사유, 맘카페 이름
                   <br />
-                  선택 - 광고성 정보 수신 동의 여부
+                  선택 - 빠른 상담 여부, 상담 선호 시간, 상담 시간 메모,
+                  광고성 정보 수신 동의 여부
                   <br />
                 </p>
                 <p className={styles.modalPrivacyItem}>
