@@ -102,16 +102,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [contactError, setContactError] = useState("");
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  // [선택] 광고성 정보 수신 동의 — 기본 꺼짐, 안 해도 신청 가능 (정보통신망법 제50조, 2026-11-13)
-  const [marketingAgreed, setMarketingAgreed] = useState(false);
-  const [showMarketingModal, setShowMarketingModal] = useState(false);
-  // 「모두 동의」 — 필수(개인정보) + 선택(광고성 정보 수신)을 한 번에 켜고 끔. 제출 조건(isFormValid)은 필수만 봄
-  const allConsentsAgreed = privacyAgreed && marketingAgreed;
-  const toggleAllConsents = () => {
-    const next = !allConsentsAgreed;
-    setPrivacyAgreed(next);
-    setMarketingAgreed(next);
-  };
+  // 2026-11-25 동의를 개인정보처리방침 하나로 통합(그 안에 「개인정보 수집 · 이용 동의」 — 홍보 · 광고성 정보 제공 목적 포함) — 신청하면 광고 수신 동의도 기록
+  const marketingAgreed = privacyAgreed;
   const [quickConsult, setQuickConsult] = useState(false); // (선택) 빠른 상담
   const [preferredTimes, setPreferredTimes] = useState<string[]>([]); // 상담 선호 시간
   const [timeMemo, setTimeMemo] = useState(""); // 상담 시간 관련 메모
@@ -511,37 +503,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             <div className={`${styles.inputGroup} ${styles.consentGroup}`}>
               <div className={styles.privacyRow}>
                 <span className={styles.privacyText}>
-                  <span className={styles.privacyAgree}>모두 동의합니다</span>{" "}
-                  <span className={styles.privacyAgree}>(선택 항목 포함)</span>
-                </span>
-                <button
-                  type="button"
-                  className={`${styles.quickConsultCheck} ${allConsentsAgreed ? styles.quickConsultCheckOn : ""}`}
-                  onClick={toggleAllConsents}
-                  aria-pressed={allConsentsAgreed}
-                  aria-label="모두 동의합니다 (선택 항목 포함)"
-                >
-                  {allConsentsAgreed && (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3.5 8.5L6.5 11.5L12.5 4.5"
-                        stroke="#fff"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              <div className={styles.privacyRow}>
-                <span className={styles.privacyText}>
                   <button
                     type="button"
                     onClick={() => setShowPrivacyModal(true)}
@@ -560,44 +521,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   aria-label="개인정보처리방침 동의 (필수)"
                 >
                   {privacyAgreed && (
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3.5 8.5L6.5 11.5L12.5 4.5"
-                        stroke="#fff"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              <div className={styles.privacyRow}>
-                <span className={styles.privacyText}>
-                  <button
-                    type="button"
-                    onClick={() => setShowMarketingModal(true)}
-                    className={styles.privacyLink}
-                  >
-                    광고성 정보 수신
-                  </button>{" "}
-                  <span className={styles.privacyAgree}>동의</span>{" "}
-                  <span className={styles.privacyAgree}>(선택)</span>
-                </span>
-                <button
-                  type="button"
-                  className={`${styles.quickConsultCheck} ${marketingAgreed ? styles.quickConsultCheckOn : ""}`}
-                  onClick={() => setMarketingAgreed((prev) => !prev)}
-                  aria-pressed={marketingAgreed}
-                  aria-label="광고성 정보 수신 동의 (선택)"
-                >
-                  {marketingAgreed && (
                     <svg
                       width="16"
                       height="16"
@@ -651,64 +574,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
         )}
       </AnimatePresence>
 
-      {/* [선택] 광고성 정보 수신 동의 모달 (2026-11-13) */}
-      {showMarketingModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowMarketingModal(false)}
-        >
-          <div
-            className={styles.modalPrivacy}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.modalPrivacyHeader}>
-              <h3 className={styles.modalPrivacyTitle}>[선택] 광고성 정보 수신 동의</h3>
-              <button
-                className={styles.modalCloseButton}
-                onClick={() => setShowMarketingModal(false)}
-                aria-label="닫기"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
-            <div className={styles.modalPrivacyContent}>
-              <div className={styles.modalPrivacyScroll}>
-                <p className={styles.modalPrivacyItem}>
-                  (주)한평생그룹은 이벤트 안내를 위해 휴대폰 번호로 광고성 정보를 발송해요. 발송 채널은 SMS, 알림톡이며, 보유 기간은 동의 철회 시까지예요.
-                </p>
-                <p className={styles.modalPrivacyItem}>
-                  <strong>1. 수집 및 이용 목적</strong>
-                  <br />
-                  이벤트 안내(광고성 정보 발송)
-                </p>
-                <p className={styles.modalPrivacyItem}>
-                  <strong>2. 수집 항목</strong>
-                  <br />
-                  휴대폰 번호
-                </p>
-                <p className={styles.modalPrivacyItem}>
-                  <strong>3. 발송 채널</strong>
-                  <br />
-                  SMS, 알림톡
-                </p>
-                <p className={styles.modalPrivacyItem}>
-                  <strong>4. 보유 기간</strong>
-                  <br />
-                  동의 철회 시까지
-                </p>
-                <p className={styles.modalPrivacyItem}>
-                  <strong>5. 거부 권리 및 거부 시 불이익</strong>
-                  <br />
-                  동의를 거부할 수 있어요. 거부해도 상담 신청에는 불이익이 없고, 동의한 뒤에도 언제든 무료수신거부로 철회할 수 있어요.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 개인정보처리방침 모달 */}
       {showPrivacyModal && (
         <div
@@ -759,21 +624,32 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정,
                   취득사유, 맘카페 이름
                   <br />
-                  선택 - 빠른 상담 여부, 상담 선호 시간, 상담 시간 메모,
-                  광고성 정보 수신 동의 여부
+                  선택 - 빠른 상담 여부, 상담 선호 시간, 상담 시간 메모
                   <br />
                 </p>
                 <p className={styles.modalPrivacyItem}>
-                  <strong>3. 보유 및 이용 기간</strong>
-                  <br />
-                  법령이 정하는 경우를 제외하고는 수집일로부터 5년 또는 동의
-                  철회 시까지 보유 및 이용합니다.
-                </p>
-                <p className={styles.modalPrivacyItem}>
-                  <strong>4. 동의 거부 권리</strong>
+                  <strong>3. 동의 거부 권리</strong>
                   <br />
                   신청자는 동의를 거부할 권리가 있습니다. 단, 동의를 거부하는
                   경우 상담 서비스 이용이 제한됩니다.
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  <strong>4. 개인정보 수집 · 이용 동의</strong>
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  회사는 수집한 개인정보를 다음의 목적을 위해 활용합니다.
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  학점은행제 교육과정 이용에 필요한 사항 제공 및 안내
+                  <br />
+                  신규 서비스 및 연수과정 홍보, 이벤트 및 광고성 정보 제공 및 참여기회 제공
+                </p>
+                <p className={styles.modalPrivacyItem}>
+                  수집하는 개인 정보 항목 : 이름, 연락처, 관심과정
+                  <br />
+                  보유 및 이용기간 : 신청일 기준 3년 이내
+                  <br />
+                  보존근거 : 소비자보호에 관한 법률 시행령 제6조 제3항
                 </p>
               </div>
             </div>
